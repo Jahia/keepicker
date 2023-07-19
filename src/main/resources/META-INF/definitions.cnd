@@ -1,0 +1,14 @@
+<jnt = 'http://www.jahia.org/jahia/nt/1.0'>
+<jmix = 'http://www.jahia.org/jahia/mix/1.0'>
+<kpkmix = 'http://modules.se.jahia.org/keepeek/mix/1.0'>
+<kpknt = 'http://modules.se.jahia.org/keepeek/nt/1.0'>
+<kpk = 'http://modules.se.jahia.org/keepeek/1.0'>
+
+[kpkmix:kpkAsset] > jmix:structuredContent, jmix:tagged, jmix:keywords, mix:title mixin
+ - kpk:assetId (string) fulltextsearchable=no
+ 
+ 
+[kpknt:image] > jnt:content, kpkmix:kpkAsset
+
+[kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
+ - j:node (weakreference) < 'kpkmix:kpkAsset'
