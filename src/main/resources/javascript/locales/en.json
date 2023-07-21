@@ -1,13 +1,11 @@
 {
   "label": {
-    "settings": {
-      "title": "Keepeek Picker setting"
+    "selectorConfig": {
+      "label": "Keepeek",
+      "description": "Pick a content from Keepeek digital asset manager"
     },
-    "action": {
-      "title": "Keepeek Picker - How to extend the ui ?"
-    },
-    "appsAccordion": {
-      "title": "Keepeek Picker"
+    "referenceCard": {
+      "emptyLabel": "Click to select a Keepeek asset"
     }
   }
 }

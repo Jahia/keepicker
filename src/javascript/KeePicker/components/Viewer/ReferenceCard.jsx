@@ -118,6 +118,7 @@ const styles = theme => ({
     }
 });
 
+//TODO
 const getImgUrl = ({poster,baseUrl,endUrl}) => `${baseUrl}/w_200/${poster || endUrl}`;
 
 const ReferenceCardCmp = ({

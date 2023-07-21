@@ -13,7 +13,7 @@ export const registerKeePickerActions = registry => {
         }
     });
 
-    registry.add('action', 'replaceCloudinaryContent', replaceAction, {
+    registry.add('action', 'replaceKeepeekContent', replaceAction, {
         buttonIcon: <Edit/>,
         buttonLabel: 'content-editor:label.contentEditor.edit.fields.actions.replace',
         targets: ['content-editor/field/KeePickerActions:1']

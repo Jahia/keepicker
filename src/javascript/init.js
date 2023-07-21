@@ -10,7 +10,7 @@ export default function () {
     //load keepeek js TODO
     const script = document.createElement('script');
     script.type = 'text/javascript'
-    script.src = 'https://media-library.cloudinary.com/global/all.js';
+    script.src = 'https://kpkepic.z28.web.core.windows.net/poc-keepicker-auth/0.1.0/static/js/main.efe266d5.js';
     script.async = true;
     document.getElementsByTagName('head')[0].appendChild(script)
 
