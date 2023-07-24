@@ -157,7 +157,7 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
                     onClose={handleClose}
                 >
                 <DialogTitle>
-                    Widen Picker
+                    KeePicker
                 </DialogTitle>
                 <DialogContent dividers={dialogConfig.dividers}>
                     <kpk-keepicker
