@@ -110,7 +110,8 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
         dividers: "true"
     };
 
-    const keepickerCardClick = (media) => {
+    // const keepickerCardClick = (media) => {
+    window.keepickerCardClick = (media) => {
         console.log("keepicker media",media);
     }
 
