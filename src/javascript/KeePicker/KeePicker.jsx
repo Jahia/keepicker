@@ -141,52 +141,45 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
 
     return (
         <div className="flexFluid flexRow_nowrap alignCenter">
-            {/*{widget &&*/}
-            <>
-                <ReferenceCard
-                    isReadOnly={field.readOnly}
-                    emptyLabel={t('keepicker:label.referenceCard.emptyLabel')}
-                    emptyIcon={toIconComponent(svgCloudyLogo)}
-                    labelledBy={`${field.name}-label`}
-                    fieldData={fieldData} //{fieldData}
-                    onClick={handleShow}
+            <ReferenceCard
+                isReadOnly={field.readOnly}
+                emptyLabel={t('keepicker:label.referenceCard.emptyLabel')}
+                emptyIcon={toIconComponent(svgCloudyLogo)}
+                labelledBy={`${field.name}-label`}
+                fieldData={fieldData} //{fieldData}
+                onClick={handleShow}
+            />
+            {inputContext.displayActions && value && (
+                <DisplayAction
+                    actionKey="content-editor/field/KeePicker"
+                    value={value}
+                    field={field}
+                    inputContext={inputContext}
+                    render={ButtonRenderer}
                 />
-                {inputContext.displayActions && value && (
-                    <DisplayAction
-                        actionKey="content-editor/field/KeePicker"
-                        value={value}
-                        field={field}
-                        inputContext={inputContext}
-                        render={ButtonRenderer}
-                    />
-                )}
-                <Dialog
-                    open={open}
-                    fullWidth={dialogConfig.fullWidth}
-                    maxWidth={dialogConfig.maxWidth}
-                    classes={{paper: classes.dialogPaper}}
-                    onClose={handleClose}
-                    onEntered={handleEntered}
-                >
-                    {/*<DialogTitle>*/}
-                    {/*    KeePicker*/}
-                    {/*</DialogTitle>*/}
-                    <DialogContent dividers={dialogConfig.dividers}>
-                        <kpk-keepicker
-                            ref={keepickerEl}
-                            keycloak-url="https://auth.keepeek.com/auth"
-                            keycloak-realm="iconeek"
-                            keycloak-client-id="refront-iconeek-kpk-iconeek"
-                            api-endpoint="https://iconeek.keepeek.com"
-                            data-locale="FR"
-                            ui-locale="FR"
-                            card-click="keepickerCardClick"
-                        >
-                        </kpk-keepicker>
-                    </DialogContent>
-                </Dialog>
-            </>
-        {/*}*/}
+            )}
+            <Dialog
+                open={open}
+                fullWidth={dialogConfig.fullWidth}
+                maxWidth={dialogConfig.maxWidth}
+                classes={{paper: classes.dialogPaper}}
+                onClose={handleClose}
+                onEntered={handleEntered}
+            >
+                <DialogContent dividers={dialogConfig.dividers}>
+                    <kpk-keepicker
+                        ref={keepickerEl}
+                        keycloak-url="https://auth.keepeek.com/auth"
+                        keycloak-realm="iconeek"
+                        keycloak-client-id="refront-iconeek-kpk-iconeek"
+                        api-endpoint="https://iconeek.keepeek.com"
+                        data-locale="FR"
+                        ui-locale="FR"
+                        card-click="keepickerCardClick"
+                    >
+                    </kpk-keepicker>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
