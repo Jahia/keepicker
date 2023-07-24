@@ -13,17 +13,17 @@ public interface KeepeekProviderConfig {
      */
     String getApiEndPoint();
 
-    /**
-     * The Keepeek API version; default is 'v1_1'
-     * @return the Keepeek api version
-     */
-    String getApiVersion();
+//    /**
+//     * The Keepeek API version; default is 'v1_1'
+//     * @return the Keepeek api version
+//     */
+//    String getApiVersion();
 
     /**
-     * The API key
+     * The API account
      * @return the Keepeek api key
      */
-    String getApiKey();
+    String getApiAccount();
 
     /**
      * The Keepeek API secret;
@@ -31,9 +31,9 @@ public interface KeepeekProviderConfig {
      */
     String getApiSecret();
 
-    /**
-     * The name of the keepeek cloud you want to connect to
-     * @return the Keepeek cloud name
-     */
-    String getCloudName();
+//    /**
+//     * The name of the keepeek cloud you want to connect to
+//     * @return the Keepeek cloud name
+//     */
+//    String getCloudName();
 }

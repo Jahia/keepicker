@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {Dialog,DialogTitle,DialogContent} from '@material-ui/core';
 import {postData} from "./engine";
 import {useQuery,useLazyQuery} from "@apollo/react-hooks";
-import {edpCoudinaryContentUUIDQuery,edpCoudinaryContentPropsQuery,ReferenceCard} from "./components";
+import {edpKeepeekContentUUIDQuery,edpKeepeekContentPropsQuery,ReferenceCard} from "./components";
 import svgCloudyLogo from "../asset/logo.svg";
 import {toIconComponent} from "@jahia/moonstone";
 import {DisplayAction} from '@jahia/ui-extender';
@@ -18,102 +18,78 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
 
     const {t} = useTranslation();
 
-    // const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpCoudinaryContentUUIDQuery);
+    const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpKeepeekContentUUIDQuery);
     //
-    // const config = window.contextJsParameters.config?.cloudinary;
+    const config = window.contextJsParameters.config?.keepeek;
 
-    // React.useEffect( () => {
-    //     if(!config?.cloudName || !config?.apiKey){
-    //         console.error("oups... cloudinary cloudName and apiKey are not configured! Please fill the cloudinary_picker_credentials.cfg file.")
-    //     }else{
-    //         if(window.cloudinary){
-    //             //#0 Prepare the cloudinary media lib
-    //             setWidget(window.cloudinary.createMediaLibrary({
-    //                 cloud_name: config.cloudName,
-    //                 api_key: config.apiKey,
-    //                 multiple: false //cannot select more than one asset
-    //             }, {
-    //                 insertHandler: (data) => {
-    //                     // console.debug("cloudinary selected content : ",data);
-    //                     //#1 fetch asset_id
-    //                     postData(
-    //                         "/resources/search",
-    //                         {expression: `public_id=${data.assets[0].public_id} && resource_type=${data.assets[0].resource_type}`}
-    //                     ).then( apiData => {
-    //                         const asset_id = apiData?.resources[0]?.asset_id;
-    //                         const edpContentPath = config.mountPoint + "/" + asset_id
-    //                         //#2 create record and get uuid
-    //                         loadEdp4UUID({
-    //                             variables: {
-    //                                 edpContentPath
-    //                             }
-    //                         })
-    //                     });
-    //                 }
-    //             } ));
-    //         }else{
-    //             console.debug("oups... no window.cloudinary available !")
-    //         }
-    //     }
-    // },[]);
+    React.useEffect( () => {
+        window.keepickerCardClick = (media) => {
+            console.log("keepicker media",media);
+            const asset_id = media?.id;
+            const edpContentPath = config.mountPoint + "/" + asset_id
+            //#2 create record and get uuid
+            loadEdp4UUID({
+                variables: {
+                    edpContentPath
+                }
+            })
+            //close Picker Dialog
+            setOpen(false)
+        }
+    },[]);
 
-    // const cloudinaryNodeInfo = useQuery(edpCoudinaryContentPropsQuery, {
-    //     variables :{
-    //         uuid : value,
-    //         language: editorContext.lang,
-    //     },
-    //     skip: !value
-    // });
-    //
-    // const error = selectedNodeUUID?.error || cloudinaryNodeInfo?.error;
-    // const loading = selectedNodeUUID?.loading || cloudinaryNodeInfo?.loading;
-    //
-    // if (error) {
-    //     const message = t(
-    //         'jcontent:label.jcontent.error.queryingContent',
-    //         {details: error.message ? error.message : ''}
-    //     );
-    //
-    //     console.warn(message);
-    // }
-    //
-    // if (loading) {
-    //     return <LoaderOverlay/>;
-    // }
-    //
-    // if(selectedNodeUUID?.data?.jcr?.result?.uuid){
-    //     onChange(selectedNodeUUID.data.jcr.result.uuid);
-    //     setTimeout(() => onBlur(), 0);
-    // }
-    //
-    // let fieldData = null;
-    // const cloudinaryJcrProps = cloudinaryNodeInfo?.data?.jcr?.result;
-    //
-    // if(cloudinaryJcrProps)
-    //     fieldData = {
-    //         name : cloudinaryJcrProps.displayName,
-    //         resourceType: cloudinaryJcrProps.resourceType?.value,
-    //         format: cloudinaryJcrProps.format?.value,
-    //         url: cloudinaryJcrProps.url?.value,
-    //         baseUrl: cloudinaryJcrProps.baseUrl?.value,
-    //         endUrl: cloudinaryJcrProps.endUrl?.value,
-    //         poster: cloudinaryJcrProps.poster?.value,
-    //         width: cloudinaryJcrProps.width?.value,
-    //         height: cloudinaryJcrProps.height?.value,
-    //         bytes: cloudinaryJcrProps.bytes?.value,
-    //         aspectRatio: cloudinaryJcrProps.aspectRatio?.value,
-    //     }
+    const keepeekNodeInfo = useQuery(edpKeepeekContentPropsQuery, {
+        variables :{
+            uuid : value,
+            language: editorContext.lang,
+        },
+        skip: !value
+    });
+
+    const error = selectedNodeUUID?.error || keepeekNodeInfo?.error;
+    const loading = selectedNodeUUID?.loading || keepeekNodeInfo?.loading;
+
+    if (error) {
+        const message = t(
+            'jcontent:label.jcontent.error.queryingContent',
+            {details: error.message ? error.message : ''}
+        );
+
+        console.warn(message);
+    }
+
+    if (loading) {
+        return <LoaderOverlay/>;
+    }
+
+    if(selectedNodeUUID?.data?.jcr?.result?.uuid){
+        onChange(selectedNodeUUID.data.jcr.result.uuid);
+        setTimeout(() => onBlur(), 0);
+    }
+
+    let fieldData = null;
+    const keepeekJcrProps = keepeekNodeInfo?.data?.jcr?.result;
+
+    if(keepeekJcrProps)
+        fieldData = {
+            name : keepeekJcrProps.displayName,
+            resourceType: keepeekJcrProps.resourceType?.value,
+            format: keepeekJcrProps.format?.value,
+            url: keepeekJcrProps.url?.value,
+            baseUrl: keepeekJcrProps.baseUrl?.value,
+            endUrl: keepeekJcrProps.endUrl?.value,
+            poster: keepeekJcrProps.poster?.value,
+            width: keepeekJcrProps.width?.value,
+            height: keepeekJcrProps.height?.value,
+            bytes: keepeekJcrProps.bytes?.value,
+            aspectRatio: keepeekJcrProps.aspectRatio?.value,
+        }
 
     const dialogConfig = {
         fullWidth: true,
         maxWidth: 'xl',
         dividers: "true"
     };
-
-    // const keepickerCardClick = (media) => {
-    window.keepickerCardClick = (media) => {
-        console.log("keepicker media",media);
-    }
 
     const handleShow = () =>
         setOpen(true)

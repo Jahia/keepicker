@@ -36,17 +36,17 @@ public class KeepeekProviderConfigImpl implements ManagedService, KeepeekProvide
     public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
         if (properties != null) {
             this.properties = properties;
-            logger.info("Cloudinary provider configuration reloaded");
+            logger.info("Keepeek provider configuration reloaded");
             if (isConfigurationReady() && bundleContext.getBundle().getState() == Bundle.ACTIVE) {
-                logger.info("Cloudinary provider configuration is ready");
+                logger.info("Keepeek provider configuration is ready");
                 startServices();
             } else {
-                logger.warn("Cloudinary provider configuration is incomplete, please check your configuration");
+                logger.warn("Keepeek provider configuration is incomplete, please check your configuration");
                 stopServices();
             }
         } else {
             this.properties = new Hashtable<>();
-            logger.info("Cloudinary provider configuration removed");
+            logger.info("Keepeek provider configuration removed");
             stopServices();
         }
     }
@@ -65,7 +65,7 @@ public class KeepeekProviderConfigImpl implements ManagedService, KeepeekProvide
         try {
             keepeekMountPointService.start(this);
         } catch (Exception e) {
-            throw new ConfigurationException("Global config", "Error starting Cloudinary Provider services", e);
+            throw new ConfigurationException("Global config", "Error starting Keepeek Provider services", e);
         }
     }
 
@@ -73,17 +73,17 @@ public class KeepeekProviderConfigImpl implements ManagedService, KeepeekProvide
         try {
             keepeekMountPointService.stop();
         } catch (Exception e) {
-            throw new ConfigurationException("Global config", "Error stopping Cloudinary Provider services", e);
+            throw new ConfigurationException("Global config", "Error stopping Keepeek Provider services", e);
         }
     }
 
     private boolean isConfigurationReady(){
         return StringUtils.isNotEmpty(getApiSchema()) &&
                 StringUtils.isNotEmpty(getApiEndPoint()) &&
-                StringUtils.isNotEmpty(getApiVersion()) &&
-                StringUtils.isNotEmpty(getApiKey()) &&
-                StringUtils.isNotEmpty(getApiSecret()) &&
-                StringUtils.isNotEmpty(getCloudName());
+//                StringUtils.isNotEmpty(getApiVersion()) &&
+                StringUtils.isNotEmpty(getApiAccount()) &&
+                StringUtils.isNotEmpty(getApiSecret());
+//                StringUtils.isNotEmpty(getCloudName());
     }
 
     @Override
@@ -92,16 +92,16 @@ public class KeepeekProviderConfigImpl implements ManagedService, KeepeekProvide
     @Override
     public String getApiEndPoint() { return (String) properties.get("keepeek_provider.apiEndPoint"); }
 
-    @Override
-    public String getApiVersion() { return (String) properties.get("keepeek_provider.apiVersion"); }
+//    @Override
+//    public String getApiVersion() { return (String) properties.get("keepeek_provider.apiVersion"); }
 
     @Override
-    public String getApiKey() { return (String) properties.get("keepeek_provider.apiKey"); }
+    public String getApiAccount() { return (String) properties.get("keepeek_provider.apiAccount"); }
 
     @Override
     public String getApiSecret() { return (String) properties.get("keepeek_provider.apiSecret"); }
 
-    @Override
-    public String getCloudName() { return (String) properties.get("keepeek_provider.cloudName"); }
+//    @Override
+//    public String getCloudName() { return (String) properties.get("keepeek_provider.cloudName"); }
 
 }

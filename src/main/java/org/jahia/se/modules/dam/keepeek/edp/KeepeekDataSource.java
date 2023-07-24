@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -54,16 +55,14 @@ public class KeepeekDataSource implements ExternalDataSource{
             if (identifier.equals("root")) {
                 return new ExternalData(identifier, "/", "jnt:contentFolder", new HashMap<String, String[]>());
             }else{
-                //TODO
                 synchronized (this){
                     KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(identifier);
                     if(keepeekAsset == null){
                         LOGGER.debug("no cacheEntry for : "+identifier);
-                        final String path = "/"+keepeekProviderConfig.getApiVersion()+"/"+keepeekProviderConfig.getCloudName()+"/resources/search";
-                        final StringEntity jsonEntity = new StringEntity("{\"expression\": \"asset_id = "+identifier+"\"}");
+                        final String path = "/dam/medias/"+identifier;
 //                        Map<String, String> query = new LinkedHashMap<String, String>();
 //                        query.put("expand",ASSET_ENTRY_EXPAND);
-                        keepeekAsset = queryKeepeek(path,jsonEntity);
+                        keepeekAsset = queryKeepeek(path);
                         keepeekCacheManager.cacheKeepeekAsset(keepeekAsset);
                     }
                     ExternalData data = new ExternalData(identifier, "/"+identifier, keepeekAsset.getJahiaNodeType(), keepeekAsset.getProperties());
@@ -105,10 +104,10 @@ public class KeepeekDataSource implements ExternalDataSource{
     public Set<String> getSupportedNodeTypes() {
         return Sets.newHashSet(
                 "jnt:contentFolder",
-                "cloudynt:image",
-                "cloudynt:video",
-                "cloudynt:pdf",
-                "cloudynt:document"
+                "kpknt:image",
+//                "kpknt:video",
+//                "kpknt:document",
+                "kpknt:other"
         );
     }
 
@@ -127,12 +126,12 @@ public class KeepeekDataSource implements ExternalDataSource{
         return false;
     }
 
-    private KeepeekAsset queryKeepeek(String path, StringEntity jsonEntity) throws RepositoryException {
-        LOGGER.debug("Query Keepeek with path : {} and jsonEntity : {}",path,jsonEntity);
+    private KeepeekAsset queryKeepeek(String path) throws RepositoryException {
+        LOGGER.debug("Query Keepeek with path : {} ",path);
         try {
             String schema = keepeekProviderConfig.getApiSchema();
             String endpoint = keepeekProviderConfig.getApiEndPoint();
-            String apiKey = keepeekProviderConfig.getApiKey();
+            String apiAccount = keepeekProviderConfig.getApiAccount();
             String apiSecret = keepeekProviderConfig.getApiSecret();
 
 //            List<NameValuePair> parameters = new ArrayList<>(query.size());
@@ -149,19 +148,18 @@ public class KeepeekDataSource implements ExternalDataSource{
             URI uri = builder.build();
 
             long l = System.currentTimeMillis();
-            final HttpPost postMethod = new HttpPost(uri);
-            postMethod.setEntity(jsonEntity);
+            HttpGet getMethod = new HttpGet(uri);
 
             //NOTE Keepeek return content in ISO-8859-1 even if Accept-Charset = UTF-8 is set.
             //Need to use appropriate charset later to read the inputstream response.
-            String encoding = Base64.getEncoder().encodeToString((apiKey+":"+apiSecret).getBytes("UTF-8"));
-            postMethod.setHeader(HttpHeaders.AUTHORIZATION,"Basic " + encoding);
-            postMethod.setHeader("Content-Type","application/json");
+            String encoding = Base64.getEncoder().encodeToString((apiAccount+":"+apiSecret).getBytes("UTF-8"));
+            getMethod.setHeader(HttpHeaders.AUTHORIZATION,"Basic " + encoding);
+            getMethod.setHeader("Content-Type","application/json");
 //            getMethod.setRequestHeader("Accept-Charset","ISO-8859-1");
 //            getMethod.setRequestHeader("Accept-Charset","UTF-8");
             CloseableHttpResponse resp = null;
             try {
-                resp = httpClient.execute(postMethod);
+                resp = httpClient.execute(getMethod);
                 KeepeekAsset keepeekAsset = mapper.readValue(EntityUtils.toString(resp.getEntity()),KeepeekAsset.class);
                 return keepeekAsset;
 

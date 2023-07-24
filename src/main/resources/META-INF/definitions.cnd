@@ -28,5 +28,7 @@
  - kpk:medium (string) fulltextsearchable=no
  - kpk:small (string) fulltextsearchable=no
 
+[kpknt:other] > jnt:content, kpkmix:kpkAsset
+
 [kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
  - j:node (weakreference) < 'kpkmix:kpkAsset'
