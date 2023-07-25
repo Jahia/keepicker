@@ -73,16 +73,13 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
     if(keepeekJcrProps)
         fieldData = {
             name : keepeekJcrProps.displayName,
-            resourceType: keepeekJcrProps.resourceType?.value,
+            formType: keepeekJcrProps.formType?.value,
             format: keepeekJcrProps.format?.value,
-            url: keepeekJcrProps.url?.value,
-            baseUrl: keepeekJcrProps.baseUrl?.value,
-            endUrl: keepeekJcrProps.endUrl?.value,
             poster: keepeekJcrProps.poster?.value,
             width: keepeekJcrProps.width?.value,
             height: keepeekJcrProps.height?.value,
-            bytes: keepeekJcrProps.bytes?.value,
-            aspectRatio: keepeekJcrProps.aspectRatio?.value,
+            fileSize: keepeekJcrProps.fileSize?.value,
+            fileSizeString: keepeekJcrProps.fileSizeString?.value,
         }
 
     const dialogConfig = {
@@ -114,7 +111,7 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
                     emptyLabel={t('keepicker:label.referenceCard.emptyLabel')}
                     emptyIcon={toIconComponent(svgCloudyLogo)}
                     labelledBy={`${field.name}-label`}
-                    fieldData={null} //{fieldData}
+                    fieldData={fieldData} //{fieldData}
                     onClick={handleShow}
                 />
                 {inputContext.displayActions && value && (

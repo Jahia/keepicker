@@ -118,8 +118,7 @@ const styles = theme => ({
     }
 });
 
-//TODO
-const getImgUrl = ({poster,baseUrl,endUrl}) => `${baseUrl}/w_200/${poster || endUrl}`;
+const getAspectRation = ({width,height}) => Math.ceil(Number(width)/Number(height));
 
 const ReferenceCardCmp = ({
     classes,
@@ -161,18 +160,14 @@ const ReferenceCardCmp = ({
                     }}
                 >
                     <div className={classes.fieldFigureContainer}>
-                        <img src={getImgUrl({
-                            poster:fieldData.poster,
-                            baseUrl:fieldData.baseUrl,
-                            endUrl:fieldData.endUrl
-                        })} className={classes.fieldImage} aria-labelledby={nameId} alt=""/>
+                        <img src={fieldData.poster} className={classes.fieldImage} aria-labelledby={nameId} alt=""/>
                     </div>
                     <div className={classes.fieldSelectedMetadata}>
                         <Typography data-sel-field-picker-name variant="caption" id={nameId}>
                             {fieldData.name}
                         </Typography>
                         <Typography data-sel-field-picker-info variant="body">
-                            {fieldData.width} x {fieldData.height} px (r:{fieldData.aspectRatio} )
+                            {fieldData.width} x {fieldData.height} px (r:{getAspectRation({width:fieldData.width,height:fieldData.height})} )
                         </Typography>
                     </div>
                 </article>

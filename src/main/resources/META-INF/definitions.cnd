@@ -20,10 +20,13 @@
  - kpk:mediaType (string) fulltextsearchable=no
  - kpk:formType (string) fulltextsearchable=no
  - kpk:thumbnailGenerationStatus (string) fulltextsearchable=no
- - kpk:cover (string) fulltextsearchable=no
+// - kpk:cover (string) fulltextsearchable=no
+ - kpk:poster (string) fulltextsearchable=no
+
  
  
 [kpknt:image] > jnt:content, kpkmix:kpkAsset
+ - kpk:xlarge (string) fulltextsearchable=no
  - kpk:large (string) fulltextsearchable=no
  - kpk:medium (string) fulltextsearchable=no
  - kpk:small (string) fulltextsearchable=no

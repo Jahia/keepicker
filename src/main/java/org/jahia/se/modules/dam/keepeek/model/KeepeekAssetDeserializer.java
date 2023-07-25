@@ -62,7 +62,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
 //        "cloudymix:cloudyAsset"
 //        keepeekAsset.addProperty("jcr:mixinTypes","cloudymix:cloudyAsset");
 
-        String formType = keepeekNode.get("status").textValue();
+        String formType = keepeekNode.get("formType").textValue();
 
         keepeekAsset.setId(keepeekNode.get("id").textValue());
         keepeekAsset.addProperty(PREFIX+"assetId",keepeekNode.get("id").textValue());
@@ -81,13 +81,15 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"mediaType",keepeekNode.get("mediaType").textValue());
         keepeekAsset.addProperty(PREFIX+"formType",formType);
         keepeekAsset.addProperty(PREFIX+"thumbnailGenerationStatus",keepeekNode.get("thumbnailGenerationStatus").textValue());
-        keepeekAsset.addProperty(PREFIX+"cover",keepeekNode.at("/_links/kpk:cover/href").textValue());
+//        keepeekAsset.addProperty(PREFIX+"cover",keepeekNode.at("/_links/kpk:cover/href").textValue());
 
         switch (formType){
             case FORM_TYPE_IMAGE :
+                keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:small/href").textValue());
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
                 break;
 

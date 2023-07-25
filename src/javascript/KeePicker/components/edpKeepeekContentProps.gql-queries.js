@@ -8,10 +8,11 @@ export const edpKeepeekContentPropsQuery = gql`
                 displayName(language: $language)
                 formType: property(name: "kpk:formType") {value}
                 format: property(name: "kpk:format") {value}
-                cover: property(name: "kpk:cover") {value}
+                poster: property(name: "kpk:poster") {value}
                 width: property(name: "kpk:width") {value}
                 height: property(name: "kpk:height") {value}
-                bytes: property(name: "kpk:fileSize") {value}
+                fileSize: property(name: "kpk:fileSize") {value}
+                fileSizeString: property(name: "kpk:fileSizeString") {value}
                 ...NodeCacheRequiredFields
             }
         }
