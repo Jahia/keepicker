@@ -118,7 +118,7 @@ const styles = theme => ({
     }
 });
 
-const getAspectRation = ({width,height}) => Math.ceil(Number(width)/Number(height));
+const getAspectRation = ({width,height}) => (Number(width)/Number(height)).toFixed(2);
 
 const ReferenceCardCmp = ({
     classes,

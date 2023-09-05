@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {LoaderOverlay} from '../DesignSystem/LoaderOverlay';
 import {useTranslation} from 'react-i18next';
-import {Dialog,DialogTitle,DialogContent} from '@material-ui/core';
-import {postData} from "./engine";
+import {Dialog,withStyles,DialogContent} from '@material-ui/core';
+
 import {useQuery,useLazyQuery} from "@apollo/react-hooks";
 import {edpKeepeekContentUUIDQuery,edpKeepeekContentPropsQuery,ReferenceCard} from "./components";
 import svgCloudyLogo from "../asset/logo.svg";
@@ -13,9 +13,17 @@ import {getButtonRenderer} from '../utils';
 
 const ButtonRenderer = getButtonRenderer({labelStyle: 'none', defaultButtonProps: {variant: 'ghost'}});
 
-export const KeePicker = ({field, value, editorContext, inputContext, onChange, onBlur}) => {
-    const [open,setOpen] = React.useState(false);
+const styles = theme => ({
+    dialogPaper: {
+        minHeight: 'calc(100vh - 96px)',
+        maxHeight: 'calc(100vh - 96px)'
+    }
+})
 
+const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onChange, onBlur}) => {
+    const [open,setOpen] = React.useState(false);
+    const [dialogEntered,setDialogEntered] = React.useState(false);
+    const keepickerEl = React.useRef(null);
     const {t} = useTranslation();
 
     const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpKeepeekContentUUIDQuery);
@@ -23,20 +31,43 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
     const config = window.contextJsParameters.config?.keepeek;
 
     React.useEffect( () => {
-        window.keepickerCardClick = (media) => {
+        const handleMediaSelection = (event) =>{
+            const media = event.detail.element;
             console.log("keepicker media",media);
             const asset_id = media?.id;
-            const edpContentPath = config.mountPoint + "/" + asset_id
-            //#2 create record and get uuid
-            loadEdp4UUID({
-                variables: {
-                    edpContentPath
-                }
-            })
-            //close Picker Dialog
-            setOpen(false)
+                const edpContentPath = config.mountPoint + "/" + asset_id
+                //#2 create record and get uuid
+                loadEdp4UUID({
+                    variables: {
+                        edpContentPath
+                    }
+                })
+                //close Picker Dialog
+                setOpen(false)
         }
-    },[]);
+        if(dialogEntered && keepickerEl && keepickerEl.current){
+            keepickerEl.current.addEventListener("kpk-insert", handleMediaSelection);
+
+            // return () => {
+            //     keepickerEl.current.removeEventListener("kpk-insert",handleMediaSelection)
+            // }
+        }
+
+
+        window.keepickerCardClick = (media) => {
+            console.log("keepickerCardClick media",media);
+            // const asset_id = media?.id;
+            // const edpContentPath = config.mountPoint + "/" + asset_id
+            // //#2 create record and get uuid
+            // loadEdp4UUID({
+            //     variables: {
+            //         edpContentPath
+            //     }
+            // })
+            // //close Picker Dialog
+            // setOpen(false)
+        }
+    },[dialogEntered]);
 
     const keepeekNodeInfo = useQuery(edpKeepeekContentPropsQuery, {
         variables :{
@@ -93,8 +124,14 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
         // alert("open popup keepeek")
         // widget.show();
 
-    const handleClose = () =>
+    const handleClose = () =>{
         setOpen(false)
+        setDialogEntered(false)
+    }
+
+
+    const handleEntered = () =>
+        setDialogEntered(true)
 
     inputContext.actionContext={
         handleShow,
@@ -127,32 +164,35 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
                     open={open}
                     fullWidth={dialogConfig.fullWidth}
                     maxWidth={dialogConfig.maxWidth}
-                    // classes={{paper: classes.dialogPaper}}
+                    classes={{paper: classes.dialogPaper}}
                     onClose={handleClose}
+                    onEntered={handleEntered}
                 >
-                <DialogTitle>
-                    KeePicker
-                </DialogTitle>
-                <DialogContent dividers={dialogConfig.dividers}>
-                    <kpk-keepicker
-                        keycloak-url="https://auth.keepeek.com/auth"
-                        keycloak-realm="iconeek"
-                        keycloak-client-id="refront-iconeek-kpk-iconeek"
-                        api-endpoint="https://iconeek.keepeek.com"
-                        data-locale="FR"
-                        ui-locale="FR"
-                        card-click="keepickerCardClick">
-
-                    </kpk-keepicker>
-                </DialogContent>
-            </Dialog>
+                    {/*<DialogTitle>*/}
+                    {/*    KeePicker*/}
+                    {/*</DialogTitle>*/}
+                    <DialogContent dividers={dialogConfig.dividers}>
+                        <kpk-keepicker
+                            ref={keepickerEl}
+                            keycloak-url="https://auth.keepeek.com/auth"
+                            keycloak-realm="iconeek"
+                            keycloak-client-id="refront-iconeek-kpk-iconeek"
+                            api-endpoint="https://iconeek.keepeek.com"
+                            data-locale="FR"
+                            ui-locale="FR"
+                            card-click="keepickerCardClick"
+                        >
+                        </kpk-keepicker>
+                    </DialogContent>
+                </Dialog>
             </>
         {/*}*/}
         </div>
     )
 }
 
-KeePicker.propTypes = {
+KeePickerCmp.propTypes = {
+    classes:PropTypes.object.isRequired,
     editorContext: PropTypes.object.isRequired,
     value: PropTypes.string,
     field: PropTypes.object.isRequired,
@@ -160,3 +200,5 @@ KeePicker.propTypes = {
     onChange: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired
 };
+
+export const KeePicker = withStyles(styles)(KeePickerCmp);
