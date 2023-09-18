@@ -63,9 +63,10 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
 //        keepeekAsset.addProperty("jcr:mixinTypes","cloudymix:cloudyAsset");
 
         String formType = keepeekNode.get("formType").textValue();
+        String id = Integer.toString(keepeekNode.get("id").intValue());
 
-        keepeekAsset.setId(keepeekNode.get("id").textValue());
-        keepeekAsset.addProperty(PREFIX+"assetId",keepeekNode.get("id").textValue());
+        keepeekAsset.setId(id);
+        keepeekAsset.addProperty(PREFIX+"assetId",id);
         keepeekAsset.addProperty(PREFIX+"originalFileName",keepeekNode.get("originalFileName").textValue());
         keepeekAsset.addProperty(PREFIX+"status",keepeekNode.get("status").textValue());
         keepeekAsset.addProperty("jcr:title",keepeekNode.get("title").textValue());

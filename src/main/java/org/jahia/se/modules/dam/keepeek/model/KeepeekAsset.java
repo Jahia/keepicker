@@ -24,7 +24,9 @@ public class KeepeekAsset {
         return properties;
     }
 
-    public void setId(String id){ this.id = id;}
+    public void setId(String id){
+        this.id = id;
+    }
     public void setJahiaNodeType(String jahiaNodeType) {
         this.jahiaNodeType = jahiaNodeType;
     }
