@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {LoaderOverlay} from '../DesignSystem/LoaderOverlay';
 import {useTranslation} from 'react-i18next';
-import {Dialog,DialogTitle,DialogContent} from '@material-ui/core';
-import {postData} from "./engine";
+import {Dialog,withStyles,DialogContent} from '@material-ui/core';
+
 import {useQuery,useLazyQuery} from "@apollo/react-hooks";
-import {edpCoudinaryContentUUIDQuery,edpCoudinaryContentPropsQuery,ReferenceCard} from "./components";
+import {edpKeepeekContentUUIDQuery,edpKeepeekContentPropsQuery,ReferenceCard} from "./components";
 import svgCloudyLogo from "../asset/logo.svg";
 import {toIconComponent} from "@jahia/moonstone";
 import {DisplayAction} from '@jahia/ui-extender';
@@ -13,96 +13,105 @@ import {getButtonRenderer} from '../utils';
 
 const ButtonRenderer = getButtonRenderer({labelStyle: 'none', defaultButtonProps: {variant: 'ghost'}});
 
-export const KeePicker = ({field, value, editorContext, inputContext, onChange, onBlur}) => {
-    const [open,setOpen] = React.useState(false);
+const styles = theme => ({
+    dialogPaper: {
+        minHeight: 'calc(100vh - 96px)',
+        maxHeight: 'calc(100vh - 96px)'
+    }
+})
 
+const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onChange, onBlur}) => {
+    const [open,setOpen] = React.useState(false);
+    const [dialogEntered,setDialogEntered] = React.useState(false);
+    const keepickerEl = React.useRef(null);
     const {t} = useTranslation();
 
-    // const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpCoudinaryContentUUIDQuery);
+    const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpKeepeekContentUUIDQuery);
     //
-    // const config = window.contextJsParameters.config?.cloudinary;
+    const config = window.contextJsParameters.config?.keepeek;
 
-    // React.useEffect( () => {
-    //     if(!config?.cloudName || !config?.apiKey){
-    //         console.error("oups... cloudinary cloudName and apiKey are not configured! Please fill the cloudinary_picker_credentials.cfg file.")
-    //     }else{
-    //         if(window.cloudinary){
-    //             //#0 Prepare the cloudinary media lib
-    //             setWidget(window.cloudinary.createMediaLibrary({
-    //                 cloud_name: config.cloudName,
-    //                 api_key: config.apiKey,
-    //                 multiple: false //cannot select more than one asset
-    //             }, {
-    //                 insertHandler: (data) => {
-    //                     // console.debug("cloudinary selected content : ",data);
-    //                     //#1 fetch asset_id
-    //                     postData(
-    //                         "/resources/search",
-    //                         {expression: `public_id=${data.assets[0].public_id} && resource_type=${data.assets[0].resource_type}`}
-    //                     ).then( apiData => {
-    //                         const asset_id = apiData?.resources[0]?.asset_id;
-    //                         const edpContentPath = config.mountPoint + "/" + asset_id
-    //                         //#2 create record and get uuid
-    //                         loadEdp4UUID({
-    //                             variables: {
-    //                                 edpContentPath
-    //                             }
-    //                         })
-    //                     });
-    //                 }
-    //             } ));
-    //         }else{
-    //             console.debug("oups... no window.cloudinary available !")
-    //         }
-    //     }
-    // },[]);
+    React.useEffect( () => {
+        const handleMediaSelection = (event) =>{
+            const media = event.detail.element;
+            console.log("keepicker media",media);
+            const asset_id = media?.id;
+                const edpContentPath = config.mountPoint + "/" + asset_id
+                //#2 create record and get uuid
+                loadEdp4UUID({
+                    variables: {
+                        edpContentPath
+                    }
+                })
+                //close Picker Dialog
+                setOpen(false)
+        }
+        if(dialogEntered && keepickerEl && keepickerEl.current){
+            keepickerEl.current.addEventListener("kpk-insert", handleMediaSelection);
 
-    // const cloudinaryNodeInfo = useQuery(edpCoudinaryContentPropsQuery, {
-    //     variables :{
-    //         uuid : value,
-    //         language: editorContext.lang,
-    //     },
-    //     skip: !value
-    // });
-    //
-    // const error = selectedNodeUUID?.error || cloudinaryNodeInfo?.error;
-    // const loading = selectedNodeUUID?.loading || cloudinaryNodeInfo?.loading;
-    //
-    // if (error) {
-    //     const message = t(
-    //         'jcontent:label.jcontent.error.queryingContent',
-    //         {details: error.message ? error.message : ''}
-    //     );
-    //
-    //     console.warn(message);
-    // }
-    //
-    // if (loading) {
-    //     return <LoaderOverlay/>;
-    // }
-    //
-    // if(selectedNodeUUID?.data?.jcr?.result?.uuid){
-    //     onChange(selectedNodeUUID.data.jcr.result.uuid);
-    //     setTimeout(() => onBlur(), 0);
-    // }
-    //
-    // let fieldData = null;
-    // const cloudinaryJcrProps = cloudinaryNodeInfo?.data?.jcr?.result;
-    //
-    // if(cloudinaryJcrProps)
-    //     fieldData = {
-    //         name : cloudinaryJcrProps.displayName,
-    //         resourceType: cloudinaryJcrProps.resourceType?.value,
-    //         format: cloudinaryJcrProps.format?.value,
-    //         url: cloudinaryJcrProps.url?.value,
-    //         baseUrl: cloudinaryJcrProps.baseUrl?.value,
-    //         endUrl: cloudinaryJcrProps.endUrl?.value,
-    //         poster: cloudinaryJcrProps.poster?.value,
-    //         width: cloudinaryJcrProps.width?.value,
-    //         height: cloudinaryJcrProps.height?.value,
-    //         bytes: cloudinaryJcrProps.bytes?.value,
-    //         aspectRatio: cloudinaryJcrProps.aspectRatio?.value,
-    //     }
+            // return () => {
+            //     keepickerEl.current.removeEventListener("kpk-insert",handleMediaSelection)
+            // }
+        }
+
+
+        window.keepickerCardClick = (media) => {
+            console.log("keepickerCardClick media",media);
+            // const asset_id = media?.id;
+            // const edpContentPath = config.mountPoint + "/" + asset_id
+            // //#2 create record and get uuid
+            // loadEdp4UUID({
+            //     variables: {
+            //         edpContentPath
+            //     }
+            // })
+            // //close Picker Dialog
+            // setOpen(false)
+        }
+    },[dialogEntered]);
+
+    const keepeekNodeInfo = useQuery(edpKeepeekContentPropsQuery, {
+        variables :{
+            uuid : value,
+            language: editorContext.lang,
+        },
+        skip: !value
+    });
+
+    const error = selectedNodeUUID?.error || keepeekNodeInfo?.error;
+    const loading = selectedNodeUUID?.loading || keepeekNodeInfo?.loading;
+
+    if (error) {
+        const message = t(
+            'jcontent:label.jcontent.error.queryingContent',
+            {details: error.message ? error.message : ''}
+        );
+
+        console.warn(message);
+    }
+
+    if (loading) {
+        return <LoaderOverlay/>;
+    }
+
+    if(selectedNodeUUID?.data?.jcr?.result?.uuid){
+        onChange(selectedNodeUUID.data.jcr.result.uuid);
+        setTimeout(() => onBlur(), 0);
+    }
+
+    let fieldData = null;
+    const keepeekJcrProps = keepeekNodeInfo?.data?.jcr?.result;
+
+    if(keepeekJcrProps)
+        fieldData = {
+            name : keepeekJcrProps.displayName,
+            formType: keepeekJcrProps.formType?.value,
+            format: keepeekJcrProps.format?.value,
+            poster: keepeekJcrProps.poster?.value,
+            width: keepeekJcrProps.width?.value,
+            height: keepeekJcrProps.height?.value,
+            fileSize: keepeekJcrProps.fileSize?.value,
+            fileSizeString: keepeekJcrProps.fileSizeString?.value,
+        }
 
     const dialogConfig = {
         fullWidth: true,
@@ -110,17 +119,19 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
         dividers: "true"
     };
 
-    const keepickerCardClick = (media) => {
-        console.log("keepicker media",media);
-    }
-
     const handleShow = () =>
         setOpen(true)
         // alert("open popup keepeek")
         // widget.show();
 
-    const handleClose = () =>
+    const handleClose = () =>{
         setOpen(false)
+        setDialogEntered(false)
+    }
+
+
+    const handleEntered = () =>
+        setDialogEntered(true)
 
     inputContext.actionContext={
         handleShow,
@@ -137,7 +148,7 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
                     emptyLabel={t('keepicker:label.referenceCard.emptyLabel')}
                     emptyIcon={toIconComponent(svgCloudyLogo)}
                     labelledBy={`${field.name}-label`}
-                    fieldData={null} //{fieldData}
+                    fieldData={fieldData} //{fieldData}
                     onClick={handleShow}
                 />
                 {inputContext.displayActions && value && (
@@ -153,32 +164,35 @@ export const KeePicker = ({field, value, editorContext, inputContext, onChange, 
                     open={open}
                     fullWidth={dialogConfig.fullWidth}
                     maxWidth={dialogConfig.maxWidth}
-                    // classes={{paper: classes.dialogPaper}}
+                    classes={{paper: classes.dialogPaper}}
                     onClose={handleClose}
+                    onEntered={handleEntered}
                 >
-                <DialogTitle>
-                    Widen Picker
-                </DialogTitle>
-                <DialogContent dividers={dialogConfig.dividers}>
-                    <kpk-keepicker
-                        keycloak-url="https://auth.keepeek.com/auth"
-                        keycloak-realm="iconeek"
-                        keycloak-client-id="refront-iconeek-kpk-iconeek"
-                        api-endpoint="https://iconeek.keepeek.com"
-                        data-locale="FR"
-                        ui-locale="FR"
-                        card-click="keepickerCardClick">
-
-                    </kpk-keepicker>
-                </DialogContent>
-            </Dialog>
+                    {/*<DialogTitle>*/}
+                    {/*    KeePicker*/}
+                    {/*</DialogTitle>*/}
+                    <DialogContent dividers={dialogConfig.dividers}>
+                        <kpk-keepicker
+                            ref={keepickerEl}
+                            keycloak-url="https://auth.keepeek.com/auth"
+                            keycloak-realm="iconeek"
+                            keycloak-client-id="refront-iconeek-kpk-iconeek"
+                            api-endpoint="https://iconeek.keepeek.com"
+                            data-locale="FR"
+                            ui-locale="FR"
+                            card-click="keepickerCardClick"
+                        >
+                        </kpk-keepicker>
+                    </DialogContent>
+                </Dialog>
             </>
         {/*}*/}
         </div>
     )
 }
 
-KeePicker.propTypes = {
+KeePickerCmp.propTypes = {
+    classes:PropTypes.object.isRequired,
     editorContext: PropTypes.object.isRequired,
     value: PropTypes.string,
     field: PropTypes.object.isRequired,
@@ -186,3 +200,5 @@ KeePicker.propTypes = {
     onChange: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired
 };
+
+export const KeePicker = withStyles(styles)(KeePickerCmp);

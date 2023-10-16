@@ -20,7 +20,7 @@
       "jahia": "javascript/apps/remoteEntry.js"
     },
     "apps": {
-      "jahia": "configs/KeePicker.jsp"
+      "jahia": "configs/Keepicker.jsp"
     }
   },
   "dependencies": {
