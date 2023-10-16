@@ -80,28 +80,20 @@ public class KeepeekProviderConfigImpl implements ManagedService, KeepeekProvide
     private boolean isConfigurationReady(){
         return StringUtils.isNotEmpty(getApiSchema()) &&
                 StringUtils.isNotEmpty(getApiEndPoint()) &&
-//                StringUtils.isNotEmpty(getApiVersion()) &&
                 StringUtils.isNotEmpty(getApiAccount()) &&
                 StringUtils.isNotEmpty(getApiSecret());
-//                StringUtils.isNotEmpty(getCloudName());
     }
 
     @Override
-    public String getApiSchema() { return (String) properties.get("keepeek_provider.apiSchema"); }
+    public String getApiSchema() { return (String) properties.get("keepeek_provider.back.apiSchema"); }
 
     @Override
-    public String getApiEndPoint() { return (String) properties.get("keepeek_provider.apiEndPoint"); }
-
-//    @Override
-//    public String getApiVersion() { return (String) properties.get("keepeek_provider.apiVersion"); }
+    public String getApiEndPoint() { return (String) properties.get("keepeek_provider.back.apiEndPoint"); }
 
     @Override
-    public String getApiAccount() { return (String) properties.get("keepeek_provider.apiAccount"); }
+    public String getApiAccount() { return (String) properties.get("keepeek_provider.back.apiAccount"); }
 
     @Override
-    public String getApiSecret() { return (String) properties.get("keepeek_provider.apiSecret"); }
-
-//    @Override
-//    public String getCloudName() { return (String) properties.get("keepeek_provider.cloudName"); }
+    public String getApiSecret() { return (String) properties.get("keepeek_provider.back.apiSecret"); }
 
 }

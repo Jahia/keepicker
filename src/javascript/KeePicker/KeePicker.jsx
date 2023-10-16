@@ -26,16 +26,17 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
     const keepickerEl = React.useRef(null);
     const {t} = useTranslation();
 
+
     const [loadEdp4UUID, selectedNodeUUID] = useLazyQuery(edpKeepeekContentUUIDQuery);
-    //
-    const config = window.contextJsParameters.config?.keepeek;
+    const keepeekConfig = window.contextJsParameters.config?.keepeek;
+
 
     React.useEffect( () => {
         const handleMediaSelection = (event) =>{
             const media = event.detail.element;
             console.log("keepicker media",media);
             const asset_id = media?.id;
-                const edpContentPath = config.mountPoint + "/" + asset_id
+                const edpContentPath = keepeekConfig.mountPoint + "/" + asset_id
                 //#2 create record and get uuid
                 loadEdp4UUID({
                     variables: {
@@ -57,7 +58,7 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
         window.keepickerCardClick = (media) => {
             console.log("keepickerCardClick media",media);
             // const asset_id = media?.id;
-            // const edpContentPath = config.mountPoint + "/" + asset_id
+            // const edpContentPath = keepeekConfig.mountPoint + "/" + asset_id
             // //#2 create record and get uuid
             // loadEdp4UUID({
             //     variables: {
@@ -139,6 +140,11 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
         onBlur
     }
 
+    if(!keepeekConfig.keycloakUrl || !keepeekConfig.keycloakRealm || !keepeekConfig.keycloakClientId || !keepeekConfig.apiEndPoint){
+        console.error("Keepeek front config error at least one front paramter is missing check the files org.jahia.se.modules.keepicker_credentials")
+        return <p>config issue</p>
+    }
+
     return (
         <div className="flexFluid flexRow_nowrap alignCenter">
             <ReferenceCard
@@ -169,13 +175,13 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
                 <DialogContent dividers={dialogConfig.dividers}>
                     <kpk-keepicker
                         ref={keepickerEl}
-                        keycloak-url="https://auth.keepeek.com/auth"
-                        keycloak-realm="iconeek"
-                        keycloak-client-id="refront-iconeek-kpk-iconeek"
-                        api-endpoint="https://iconeek.keepeek.com"
-                        data-locale="FR"
-                        ui-locale="FR"
-                        card-click="keepickerCardClick"
+                        keycloak-url= {keepeekConfig.keycloakUrl}
+                        keycloak-realm={keepeekConfig.keycloakRealm}
+                        keycloak-client-id={keepeekConfig.keycloakClientId}
+                        api-endpoint={keepeekConfig.apiEndPoint}
+                        // data-locale="FR"
+                        // ui-locale="FR"
+                        // card-click="keepickerCardClick"
                     >
                     </kpk-keepicker>
                 </DialogContent>
