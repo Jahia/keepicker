@@ -14,12 +14,12 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
     private static final String PREFIX = "kpk:";
 
     private static final String FORM_TYPE_IMAGE = "PICTURE";
-//    private static final String FORM_TYPE_VIDEO = "VIDEO";
+    private static final String FORM_TYPE_VIDEO = "VIDEO";
 //    private static final String FORM_TYPE_SOUND = "SOUND";
 //    private static final String FORMAT_DOCUMENT = "DOCUMENT";
 
     private static final String CONTENT_TYPE_IMAGE = "kpknt:image";
-//    private static final String CONTENT_TYPE_VIDEO = "kpknt:video";
+    private static final String CONTENT_TYPE_VIDEO = "kpknt:video";
 //    private static final String CONTENT_TYPE_PDF = "kpknt:pdf";
 //    private static final String CONTENT_TYPE_DOC = "kpknt:document";
     private static final String CONTENT_TYPE_OTHER = "kpknt:other";
@@ -71,7 +71,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"status",keepeekNode.get("status").textValue());
         keepeekAsset.addProperty("jcr:title",keepeekNode.get("title").textValue());
         keepeekAsset.addProperty(PREFIX+"statusUpdateDate",keepeekNode.get("statusUpdateDate").textValue());
-        keepeekAsset.addProperty(PREFIX+"creationDate",keepeekNode.get("creationDate").longValue());
+        keepeekAsset.addProperty(PREFIX+"creationDate",keepeekNode.get("creationDate").textValue());
         keepeekAsset.addProperty(PREFIX+"updateDate",keepeekNode.get("updateDate").textValue());
         keepeekAsset.addProperty(PREFIX+"importDate",keepeekNode.get("importDate").textValue());
         keepeekAsset.addProperty(PREFIX+"fileSize",keepeekNode.get("fileSize").longValue());
@@ -94,11 +94,16 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
                 break;
 
-//            case FORM_TYPE_VIDEO:
-//                keepeekAsset.setJahiaNodeType(CONTENT_TYPE_VIDEO);
-//                keepeekAsset.addProperty(PREFIX+"duration",keepeekNode.get("duration").doubleValue());
-//                addPoster(urls.getEndUrl(),keepeekAsset);
-//                break;
+            case FORM_TYPE_VIDEO:
+                keepeekAsset.setJahiaNodeType(CONTENT_TYPE_VIDEO);
+                keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:small/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"duration",keepeekNode.get("duration").textValue());
+                keepeekAsset.addProperty(PREFIX+"durationInSeconds",keepeekNode.get("durationInSeconds").longValue());
+                break;
 
             default:
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_OTHER);

@@ -23,13 +23,25 @@
 // - kpk:cover (string) fulltextsearchable=no
  - kpk:poster (string) fulltextsearchable=no
 
- 
- 
 [kpknt:image] > jnt:content, kpkmix:kpkAsset
  - kpk:xlarge (string) fulltextsearchable=no
  - kpk:large (string) fulltextsearchable=no
  - kpk:medium (string) fulltextsearchable=no
  - kpk:small (string) fulltextsearchable=no
+ - kpk:whr (string) fulltextsearchable=no
+
+[kpknt:video] > jnt:content, kpkmix:kpkAsset
+ - kpk:xlarge (string) fulltextsearchable=no
+ - kpk:large (string) fulltextsearchable=no
+ - kpk:medium (string) fulltextsearchable=no
+ - kpk:small (string) fulltextsearchable=no
+ - kpk:whr (string) fulltextsearchable=no
+ - kpk:preview (string) fulltextsearchable=no
+// - kpk:hires (string) fulltextsearchable=no
+ - kpk:duration (string) fulltextsearchable=no
+ - kpk:durationInSeconds (long)
+
+
 
 [kpknt:other] > jnt:content, kpkmix:kpkAsset
 
