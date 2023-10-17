@@ -23,25 +23,22 @@
 // - kpk:cover (string) fulltextsearchable=no
  - kpk:poster (string) fulltextsearchable=no
 
-[kpknt:image] > jnt:content, kpkmix:kpkAsset
+[kpkmix:kpkImageProps] mixin
  - kpk:xlarge (string) fulltextsearchable=no
  - kpk:large (string) fulltextsearchable=no
  - kpk:medium (string) fulltextsearchable=no
  - kpk:small (string) fulltextsearchable=no
  - kpk:whr (string) fulltextsearchable=no
 
-[kpknt:video] > jnt:content, kpkmix:kpkAsset
- - kpk:xlarge (string) fulltextsearchable=no
- - kpk:large (string) fulltextsearchable=no
- - kpk:medium (string) fulltextsearchable=no
- - kpk:small (string) fulltextsearchable=no
- - kpk:whr (string) fulltextsearchable=no
+[kpknt:image] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
+
+[kpknt:video] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
  - kpk:preview (string) fulltextsearchable=no
+ - kpk:480p (string) fulltextsearchable=no
+ - kpk:1080p (string) fulltextsearchable=no
 // - kpk:hires (string) fulltextsearchable=no
  - kpk:duration (string) fulltextsearchable=no
- - kpk:durationInSeconds (long)
-
-
+ - kpk:durationInSeconds (double)
 
 [kpknt:other] > jnt:content, kpkmix:kpkAsset
 

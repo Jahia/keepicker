@@ -84,25 +84,27 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"thumbnailGenerationStatus",keepeekNode.get("thumbnailGenerationStatus").textValue());
 //        keepeekAsset.addProperty(PREFIX+"cover",keepeekNode.at("/_links/kpk:cover/href").textValue());
 
+        if(formType==FORM_TYPE_IMAGE || formType==FORM_TYPE_VIDEO){
+            keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
+            keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
+            keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
+            keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
+            keepeekAsset.addProperty(PREFIX+"whr",keepeekNode.at("/_links/kpk:whr/href").textValue());
+        }
         switch (formType){
             case FORM_TYPE_IMAGE :
-                keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:small/href").textValue());
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
+                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:medium/href").textValue());
                 break;
 
             case FORM_TYPE_VIDEO:
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_VIDEO);
-                keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:small/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:whr/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"preview",keepeekNode.at("/_links/kpk:preview/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"480p",keepeekNode.at("/_links/kpk:480p/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"1080p",keepeekNode.at("/_links/kpk:1080p/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"duration",keepeekNode.get("duration").textValue());
-                keepeekAsset.addProperty(PREFIX+"durationInSeconds",keepeekNode.get("durationInSeconds").longValue());
+                keepeekAsset.addProperty(PREFIX+"durationInSeconds",keepeekNode.get("durationInSeconds").doubleValue());
                 break;
 
             default:

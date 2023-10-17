@@ -10,7 +10,7 @@
     <template:param name="size" value="${currentResource.moduleParams.size}"/>
 </template:include>
 
-<utility:logger level="DEBUG" value="*** keepeek asset url : ${url}"/>
+<utility:logger level="DEBUG" value="*** keepeek image url : ${url}"/>
 
 <img src="${url}" width="100%"
      class="${currentResource.moduleParams.class}"
