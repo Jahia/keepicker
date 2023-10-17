@@ -4,10 +4,12 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 
-<utility:logger level="INFO" value="*** keepeek hidden url moduleParams size : ${currentResource.moduleParams.size}"/>
-
+<utility:logger level="DEBUG" value="*** keepeek hidden url moduleParams size : ${currentResource.moduleParams.size}"/>
+<%--
+size = ['xlarge','large','medium','small','whr','poster']
+--%>
 <c:set var="params" value="kpk:${not empty currentResource.moduleParams.size ?
-    currentResource.moduleParams.size : 'large'}"/>
+    currentResource.moduleParams.size : 'whr'}"/>
 
 <c:set var="url" value="${currentNode.properties[params].string}"/>
 
