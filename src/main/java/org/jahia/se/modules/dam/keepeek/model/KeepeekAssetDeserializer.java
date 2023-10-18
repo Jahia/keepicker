@@ -84,7 +84,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"thumbnailGenerationStatus",keepeekNode.get("thumbnailGenerationStatus").textValue());
 //        keepeekAsset.addProperty(PREFIX+"cover",keepeekNode.at("/_links/kpk:cover/href").textValue());
 
-        if(formType==FORM_TYPE_IMAGE || formType==FORM_TYPE_VIDEO){
+        if(FORM_TYPE_IMAGE.equals(formType) || FORM_TYPE_VIDEO.equals(formType)){
             keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
             keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
             keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
