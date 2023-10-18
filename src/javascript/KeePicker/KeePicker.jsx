@@ -54,20 +54,6 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
             // }
         }
 
-
-        // window.keepickerCardClick = (media) => {
-        //     console.log("keepickerCardClick media",media);
-        //     // const asset_id = media?.id;
-        //     // const edpContentPath = keepeekConfig.mountPoint + "/" + asset_id
-        //     // //#2 create record and get uuid
-        //     // loadEdp4UUID({
-        //     //     variables: {
-        //     //         edpContentPath
-        //     //     }
-        //     // })
-        //     // //close Picker Dialog
-        //     // setOpen(false)
-        // }
     },[dialogEntered]);
 
     const keepeekNodeInfo = useQuery(edpKeepeekContentPropsQuery, {
@@ -179,9 +165,6 @@ const KeePickerCmp = ({classes, field, value, editorContext, inputContext, onCha
                         keycloak-realm={keepeekConfig.keycloakRealm}
                         keycloak-client-id={keepeekConfig.keycloakClientId}
                         api-endpoint={keepeekConfig.apiEndPoint}
-                        // data-locale="FR"
-                        // ui-locale="FR"
-                        // card-click="keepickerCardClick"
                     >
                     </kpk-keepicker>
                 </DialogContent>
