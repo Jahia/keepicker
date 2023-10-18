@@ -5,6 +5,8 @@
 <%@ taglib prefix="utility" uri="http://www.jahia.org/tags/utilityLib" %>
 
 <utility:logger level="DEBUG" value="*** keepeek hidden url moduleParams size : ${currentResource.moduleParams.size}"/>
+<utility:logger level="DEBUG" value="*** keepeek node id : ${currentNode.identifier}"/>
+
 <%--
 size = ['xlarge','large','medium','small','whr','poster']
 --%>
