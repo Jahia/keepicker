@@ -27,7 +27,6 @@ export default function () {
                     description: 'keepicker:label.selectorConfig.description',
                     module:'keepicker',
                     icon: svgKeepeekLogo,
-
                 });
 
                 registerKeePickerActions(registry);
