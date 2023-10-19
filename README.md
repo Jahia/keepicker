@@ -79,14 +79,14 @@ To set up your Keepeek API access:
 
    ![][0072]
 
-4. Look for `org.jahia.se.modules.cloudinary_picker_credentials` and click on it.
+4. Look for `org.jahia.se.modules.keepicker_credentials.cfg` and click on it.
 
 5. Finally, update the appropriate properties and save your changes.
 
    ![][0071]
 
 6. If all the properties are set correctly, the provider should start,
-   and you should see the `cloudinary` key in the list of External providers.
+   and you should see the `keepeek` key in the list of External providers.
 
    ![][031]
 
