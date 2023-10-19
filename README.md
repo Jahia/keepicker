@@ -5,6 +5,8 @@ With this module, a contributor can easily add a Keepeek media asset to a Jahia 
 
 >If you want to be able to select media content from Jahia **and** Keepeek you can use the [DAM Selector][DamSelector] module.
 
+Note: Only image and video are handled by this module
+
 ![](./doc/images/main.png)
 
 
