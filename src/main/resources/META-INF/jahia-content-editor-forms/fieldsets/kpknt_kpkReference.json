@@ -1,0 +1,9 @@
+{
+  "name": "kpknt:kpkReference",
+  "fields": [
+    {
+      "name": "j:node",
+      "selectorType": "KeePicker"
+    }
+  ]
+}

@@ -7,7 +7,7 @@
 <c:set var="alt" value="${fn:escapeXml(currentNode.displayableName)}"/>
 
 <template:include templateType="txt" var="url" view="hidden.getURL">
-    <template:param name="size" value="${currentResource.moduleParams.size}"/>
+    <template:param name="width" value="${currentResource.moduleParams.width}"/>
 </template:include>
 
 <utility:logger level="DEBUG" value="*** keepeek image url : ${url}"/>

@@ -3,6 +3,8 @@ This module contains the implementation of the Keepeek Content Picker for Jahia 
 
 With this module, a contributor can easily add a Keepeek media asset to a Jahia page.
 
+>If you want to be able to select media content from Jahia **and** Keepeek you can use the [DAM Selector][DamSelector] module.
+
 ![](./doc/images/main.png)
 
 
@@ -19,8 +21,6 @@ This module contains:
 * The definition of a `Keepeek Asset Content Reference` content ([definition.cnd][definition.cnd]).
 * A React application : `Keepeek Content Picker` ([KeepeekPicker.jsx][react:index.js]).
   This application is a custom jContent SelectorType (aka picker) and is used to pick a Keepeek asset.
-* A proxy servlet filter used to call the Keepeek Admin API from the frontend
-  `Keepeek Proxy Servlet` ([KeepeekProxyServlet.java]).
 * A *light* implementation of an External Data Provider (EDP) named
   `Keepeek Asset Provider` ([KeepeekDataSource.java]).
 
@@ -88,8 +88,8 @@ To set up your Keepeek API access:
 
    ![][031]
 
-7. Now, you should be able to create a new `Keepeek Content Reference` content.
-   More details at the end of this doc.
+7. Now, you should be able to create a new `Keepeek Content Reference` content or select Keepeek as
+a provider if you use [DAM Selector][DamSelector].
 
 [031]: ./doc/images/031_install_completed.png
 
@@ -106,3 +106,4 @@ To set up your Keepeek API access:
 [definition.cnd]: ./src/main/resources/META-INF/definitions.cnd
 [react:index.js]: ./src/javascript/KeePicker/KeePicker.jsx
 [KeepeekDataSource.java]: ./src/main/java/org/jahia/se/modules/dam/keepeek/edp/KeepeekDataSource.java
+[DamSelector]: https://store.jahia.com/contents/modules-repository/org/jahia/se/modules/dam-selector.html
