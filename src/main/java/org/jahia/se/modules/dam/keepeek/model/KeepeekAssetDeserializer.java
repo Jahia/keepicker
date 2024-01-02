@@ -48,7 +48,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"statusUpdateDate",keepeekNode.get("statusUpdateDate").textValue());
         keepeekAsset.addProperty(PREFIX+"creationDate",keepeekNode.get("creationDate").textValue());
         keepeekAsset.addProperty(PREFIX+"updateDate",keepeekNode.get("updateDate").textValue());
-        keepeekAsset.addProperty("jcr:lastModified", ISODateTimeFormat.dateTimeNoMillis().parseDateTime(keepeekNode.get("updateDate").textValue()).toString());
+        keepeekAsset.addProperty("jcr:lastModified", ISODateTimeFormat.dateTime().parseDateTime(keepeekNode.get("updateDate").textValue()).toString());
         keepeekAsset.addProperty(PREFIX+"importDate",keepeekNode.get("importDate").textValue());
         keepeekAsset.addProperty(PREFIX+"fileSize",keepeekNode.get("fileSize").longValue());
         keepeekAsset.addProperty(PREFIX+"fileSizeString",keepeekNode.get("fileSizeString").textValue());

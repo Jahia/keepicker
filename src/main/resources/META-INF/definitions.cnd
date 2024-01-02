@@ -30,9 +30,9 @@
  - kpk:small (string) fulltextsearchable=no
  - kpk:whr (string) fulltextsearchable=no
 
-[kpknt:image] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
+[kpknt:image] > jnt:file, jmix:image, kpkmix:kpkAsset, kpkmix:kpkImageProps
 
-[kpknt:video] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
+[kpknt:video] > jnt:file, kpkmix:kpkAsset, kpkmix:kpkImageProps
  - kpk:preview (string) fulltextsearchable=no
  - kpk:480p (string) fulltextsearchable=no
  - kpk:1080p (string) fulltextsearchable=no
@@ -40,7 +40,7 @@
  - kpk:duration (string) fulltextsearchable=no
  - kpk:durationInSeconds (double)
 
-[kpknt:other] > jnt:content, kpkmix:kpkAsset
+[kpknt:other] > jnt:file, kpkmix:kpkAsset
 
-[kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
- - j:node (weakreference) < 'kpkmix:kpkAsset'
+//[kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
+// - j:node (weakreference,picker[type='file']) < 'kpkmix:kpkAsset'

@@ -12,10 +12,10 @@ public class KeepeekDecoratorDefinition extends JCRNodeDecoratorDefinition {
     private Map<String, Class> decorators = new HashMap<>();
 
     public KeepeekDecoratorDefinition() {
-        decorators.put("cloudynt:image", KeepeekDecorator.class);
-        decorators.put("cloudynt:document", KeepeekDecorator.class);
-        decorators.put("cloudynt:pdf", KeepeekDecorator.class);
-        decorators.put("cloudynt:video", KeepeekDecorator.class);
+        decorators.put("kpknt:image", KeepeekDecorator.class);
+        decorators.put("kpknt:video", KeepeekDecorator.class);
+        decorators.put("kpknt:other", KeepeekDecorator.class);
+//        decorators.put("kpknt:pdf", KeepeekDecorator.class);
     }
 
     @Override

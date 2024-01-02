@@ -7,16 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
-//TODO review
 public class KeepeekDecorator extends JCRNodeDecorator {
     private static final Logger logger = LoggerFactory.getLogger(KeepeekDecorator.class);
-    private final String THUMBNAIL_WIDTH = "200";
-    private final String URL_WIDTH = "1024";
+    private final String VIDEO_TYPE_480 = "480p";
+    private final String VIDEO_TYPE_1080 = "1080p";
+    private final String VIDEO_TYPE_PREVIEW = "preview";
+
     public KeepeekDecorator(JCRNodeWrapper node) {
         super(node);
     }
@@ -65,32 +65,32 @@ public class KeepeekDecorator extends JCRNodeDecorator {
             }else{
                 return this.getUrl();
             }
+        }else if(this.isNodeType(CONTENT_TYPE_VIDEO)){
+            String keepeekProps = VIDEO_TYPE_PREVIEW;
+            for (String param : params) {
+                if (param.startsWith("quality:")) {
+                    String quality = StringUtils.substringAfter(param, "quality:");
+                    if( VIDEO_TYPE_PREVIEW.equals(quality) ||
+                            VIDEO_TYPE_480.equals(quality) ||
+                            VIDEO_TYPE_1080.equals(quality)
+                    ){
+                        keepeekProps = quality;
+                    }
+                    return node.getProperty(keepeekProps).getString();
+                }
+            }
+            return node.getProperty(keepeekProps).getString();
         }else{
             return this.getUrl();
         }
     }
 
-    //TODO
     @Override
     public String getThumbnailUrl(String name) {
-        String width = THUMBNAIL_WIDTH;
         try {
-            StringBuilder sb = new StringBuilder();
-            sb.append(node.getProperty("cloudy:baseUrl").getString());
-            if("poster".equals(name))
-                width= URL_WIDTH;
-
-            sb.append("/f_auto,w_"+width+"/");
-
-            if (node.hasProperty("cloudy:poster")) {
-                sb.append(node.getProperty("cloudy:poster").getString());
-            } else if (node.hasProperty("cloudy:endUrl")) {
-                sb.append(node.getProperty("cloudy:endUrl").getString());
-            }
-
-            return sb.toString();
+            return node.getProperty("kpk:poster").getString();
         } catch (RepositoryException e) {
-            return getUrl();
+            return super.getUrl();
         }
     }
 }
