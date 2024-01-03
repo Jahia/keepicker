@@ -22,7 +22,6 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
     useEffect(() => {
         const handleMediaSelection = event => {
             const media = event.detail.element;
-            console.log('keepicker media', media);
             setKeepeekData(media);
         };
 
@@ -33,7 +32,8 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
 
     useEffect(() => {
         if (!error && !loading && data?.jcr?.result) {
-            onItemSelection(data.jcr.result);
+            const exts = [{url:keepeekData.previewUrl,name:keepeekData.title?.value}];
+            onItemSelection(data.jcr.result.map((m, i) => ({...m, ...exts[i]})));
         }
     }, [keepeekData, data, error, loading, onItemSelection]);
 
