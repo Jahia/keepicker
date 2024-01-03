@@ -32,7 +32,7 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
 
     useEffect(() => {
         if (!error && !loading && data?.jcr?.result) {
-            const exts = [{url:keepeekData.previewUrl,name:keepeekData.title?.value}];
+            const exts = [{url: keepeekData.previewUrl, name: keepeekData.title?.value}];
             onItemSelection(data.jcr.result.map((m, i) => ({...m, ...exts[i]})));
         }
     }, [keepeekData, data, error, loading, onItemSelection]);
