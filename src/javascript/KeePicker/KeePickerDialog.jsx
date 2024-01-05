@@ -4,9 +4,11 @@ import {LoaderOverlay} from '../DesignSystem/LoaderOverlay';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@apollo/react-hooks';
 import {edpKeepeekContentUUIDQuery} from './edpKeepeekContentUUID.gql-queries';
+import {useContentEditorContext} from '@jahia/content-editor';
 
 export const KeePickerDialog = ({className, onItemSelection}) => {
     const {t} = useTranslation();
+    const {lang,uilang} = useContentEditorContext();
     const [keepeekData, setKeepeekData] = useState();
     const keepickerEl = useRef(null);
 
@@ -27,11 +29,13 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
 
         if (keepickerEl && keepickerEl.current) {
             keepickerEl.current.addEventListener('kpk-insert', handleMediaSelection);
+            keepickerEl.current.addEventListener('kpk-insert-link', handleMediaSelection);
         }
     }, [keepickerEl]);
 
     useEffect(() => {
         if (!error && !loading && data?.jcr?.result) {
+            //TODO check the new linkto for the url
             const exts = [{url: keepeekData.previewUrl, name: keepeekData.title?.value}];
             onItemSelection(data.jcr.result.map((m, i) => ({...m, ...exts[i]})));
         }
@@ -59,10 +63,12 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
         <div className={className}>
             <kpk-keepicker
                 ref={keepickerEl}
-                keycloak-url={keepeekConfig.keycloakUrl}
-                keycloak-realm={keepeekConfig.keycloakRealm}
+                // Keycloak-url={keepeekConfig.keycloakUrl}
+                // keycloak-realm={keepeekConfig.keycloakRealm}
                 keycloak-client-id={keepeekConfig.keycloakClientId}
                 api-endpoint={keepeekConfig.apiEndPoint}
+                data-locale={lang}
+                ui-locale={uilang}
             />
         </div>
     );

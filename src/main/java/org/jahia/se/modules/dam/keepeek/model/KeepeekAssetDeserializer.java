@@ -54,6 +54,10 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"fileSizeString",keepeekNode.get("fileSizeString").textValue());
         keepeekAsset.addProperty("j:width",keepeekNode.get("width").longValue());
         keepeekAsset.addProperty("j:height",keepeekNode.get("height").longValue());
+        if(keepeekNode.has("pointOfInterest")) {
+            keepeekAsset.addProperty(PREFIX + "poiX", keepeekNode.at("/pointOfInterest/x").doubleValue());
+            keepeekAsset.addProperty(PREFIX + "poiY", keepeekNode.at("/pointOfInterest/y").doubleValue());
+        }
         keepeekAsset.addProperty(PREFIX+"resolution",keepeekNode.get("resolution").longValue());
         keepeekAsset.addProperty("jcr:mimeType",keepeekNode.get("mediaType").textValue());
         keepeekAsset.addProperty(PREFIX+"formType",formType);

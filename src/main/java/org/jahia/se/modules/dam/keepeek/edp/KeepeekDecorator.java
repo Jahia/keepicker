@@ -38,7 +38,7 @@ public class KeepeekDecorator extends JCRNodeDecorator {
             return super.getUrl();
         }
     }
-
+    //TODO review this with the signature call -> cache ?
     public String getUrl(List<String> params) throws RepositoryException {
         if(this.isNodeType(CONTENT_TYPE_IMAGE)){
             String keepeekProps = null;

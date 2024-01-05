@@ -14,10 +14,12 @@
  - kpk:importDate (string) fulltextsearchable=no
  - kpk:fileSize (long)
  - kpk:fileSizeString (string) fulltextsearchable=no
- - kpk:width (long)
- - kpk:height (long)
+ - kpk:poiX (double)
+ - kpk:poiY (double)
+// - kpk:width (long)
+// - kpk:height (long)
  - kpk:resolution (long)
- - kpk:mediaType (string) fulltextsearchable=no
+// - kpk:mediaType (string) fulltextsearchable=no
  - kpk:formType (string) fulltextsearchable=no
  - kpk:thumbnailGenerationStatus (string) fulltextsearchable=no
 // - kpk:cover (string) fulltextsearchable=no
