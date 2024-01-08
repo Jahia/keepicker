@@ -1,13 +1,30 @@
 package org.jahia.se.modules.dam.keepeek.edp;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
+import org.jahia.osgi.BundleUtils;
+import org.jahia.se.modules.dam.keepeek.model.KeepeekAsset;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.decorator.JCRNodeDecorator;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
+import java.net.URI;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
@@ -21,6 +38,7 @@ public class KeepeekDecorator extends JCRNodeDecorator {
         super(node);
     }
 
+
     @Override
     public String getDisplayableName() {
         try {
@@ -33,37 +51,57 @@ public class KeepeekDecorator extends JCRNodeDecorator {
     @Override
     public String getUrl() {
         try {
-            return node.getProperty("kpk:whr").getString();
+            return node.getProperty("kpk:url").getString();
         } catch (RepositoryException e) {
             return super.getUrl();
         }
     }
     //TODO review this with the signature call -> cache ?
     public String getUrl(List<String> params) throws RepositoryException {
+        KeepeekCacheManager keepeekCacheManager = BundleUtils.getOsgiService(KeepeekCacheManager.class, null);
+
         if(this.isNodeType(CONTENT_TYPE_IMAGE)){
-            String keepeekProps = null;
+            HashMap<String, String> keepeekProps = new HashMap<String, String>();
             for (String param : params) {
                 if (param.startsWith("width:")) {
-                    try {
-                        int width = Integer.parseInt(StringUtils.substringAfter(param, "width:"));
-                        if(width >= 1400){
-                            keepeekProps="kpk:xlarge";
-                        } else if (width >= 960) {
-                            keepeekProps="kpk:large";
-                        } else if (width >= 780) {
-                            keepeekProps="kpk:medium";
-                        } else if (width >= 256) {
-                            keepeekProps="kpk:small";
-                        }
-                    }catch (NumberFormatException e) {
-                        logger.warn("Invalid integer input for width");
+                    String width = StringUtils.substringAfter(param, "width:");
+                    if(!width.trim().isEmpty()){
+                        keepeekProps.put("w", width);
+                    }
+                }
+                if (param.startsWith("height:")) {
+                    String height = StringUtils.substringAfter(param, "height:");
+                    if(!height.trim().isEmpty()){
+                        keepeekProps.put("h", height);
                     }
                 }
             }
-            if(keepeekProps != null && !keepeekProps.isEmpty()){
-                return node.getProperty(keepeekProps).getString();
-            }else{
+            //build the key
+            StringBuilder sb = new StringBuilder();
+            for(String key : keepeekProps.keySet()){
+                sb.append(key + keepeekProps.get(key));
+            }
+
+            String resizeKey = sb.toString();
+            try{
+                //get urls as json
+                JSONObject urls =new JSONObject(this.getPropertyAsString("kpk:urls"));
+                //check if key exist and get value
+                String url = (String) urls.opt(resizeKey);
+                //else build the url
+                if(url == null || url.trim().isEmpty()){
+                    url = getResizedUrl(keepeekProps);
+                    urls.put(resizeKey,url);
+                    //store the url into the content in cache
+                    KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(this.getPropertyAsString("kpk:assetId"));
+                    keepeekAsset.addProperty("kpk:urls",urls.toString());
+                }
+                //return the signed url
+                return url;
+            } catch (JSONException e) {
+                //else build the url
                 return this.getUrl();
+//                throw new RuntimeException(e);
             }
         }else if(this.isNodeType(CONTENT_TYPE_VIDEO)){
             String keepeekProps = VIDEO_TYPE_PREVIEW;
@@ -91,6 +129,51 @@ public class KeepeekDecorator extends JCRNodeDecorator {
             return node.getProperty("kpk:poster").getString();
         } catch (RepositoryException e) {
             return super.getUrl();
+        }
+    }
+
+    private String getResizedUrl(Map<String,String> params){
+        String poiX = this.getPropertyAsString("kpk:poiX");
+        String poiY = this.getPropertyAsString("kpk:poiY");
+        String kpkp = this.getPropertyAsString("kpk:derivedSrcService");
+        String w = params.get("w");
+        String h = params.get("w");
+
+    }
+
+    private String queryKeepeekSignature(String path) throws RepositoryException {
+        try {
+            String schema = keepeekProviderConfig.getApiSchema();
+            String endpoint = keepeekProviderConfig.getApiEndPoint();
+            String apiAccount = keepeekProviderConfig.getApiAccount();
+            String apiSecret = keepeekProviderConfig.getApiSecret();
+
+            URIBuilder builder = new URIBuilder().setScheme(schema).setHost(endpoint).setPath(path);
+
+            URI uri = builder.build();
+
+            long l = System.currentTimeMillis();
+            HttpGet getMethod = new HttpGet(uri);
+
+            String encoding = Base64.getEncoder().encodeToString((apiAccount+":"+apiSecret).getBytes("UTF-8"));
+            getMethod.setHeader(HttpHeaders.AUTHORIZATION,"Basic " + encoding);
+            getMethod.setHeader("Content-Type","application/json");
+            CloseableHttpResponse resp = null;
+            try {
+                resp = httpClient.execute(getMethod);
+                //TODO
+                KeepeekAsset keepeekAsset = mapper.readValue(EntityUtils.toString(resp.getEntity()),KeepeekAsset.class);
+                return keepeekAsset;
+
+            } finally {
+                if (resp != null) {
+                    resp.close();
+                }
+                LOGGER.debug("Request {} executed in {} ms",uri, (System.currentTimeMillis() - l));
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error while querying Keepeek", e);
+            throw new RepositoryException(e);
         }
     }
 }

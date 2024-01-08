@@ -26,13 +26,15 @@
  - kpk:poster (string) fulltextsearchable=no
 
 [kpkmix:kpkImageProps] mixin
- - kpk:xlarge (string) fulltextsearchable=no
- - kpk:large (string) fulltextsearchable=no
- - kpk:medium (string) fulltextsearchable=no
- - kpk:small (string) fulltextsearchable=no
- - kpk:whr (string) fulltextsearchable=no
+// - kpk:xlarge (string) fulltextsearchable=no
+// - kpk:large (string) fulltextsearchable=no
+// - kpk:medium (string) fulltextsearchable=no
+// - kpk:small (string) fulltextsearchable=no
+ - kpk:url (string) fulltextsearchable=no
 
 [kpknt:image] > jnt:file, jmix:image, kpkmix:kpkAsset, kpkmix:kpkImageProps
+ - kpk:urls (string) fulltextsearchable=no
+ - kpk:derivedSrcService (string) fulltextsearchable=no
 
 [kpknt:video] > jnt:file, kpkmix:kpkAsset, kpkmix:kpkImageProps
  - kpk:preview (string) fulltextsearchable=no

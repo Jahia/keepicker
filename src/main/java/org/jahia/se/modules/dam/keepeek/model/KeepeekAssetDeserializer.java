@@ -39,6 +39,8 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
 
         String formType = keepeekNode.get("formType").textValue();
         String id = Integer.toString(keepeekNode.get("id").intValue());
+        //TODO
+        String derivedSrcService = null;
 
         keepeekAsset.setId(id);
         keepeekAsset.addProperty(PREFIX+"assetId",id);
@@ -70,21 +72,23 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         });
 
         if(FORM_TYPE_IMAGE.equals(formType) || FORM_TYPE_VIDEO.equals(formType)){
-            keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"whr",keepeekNode.at("/_links/kpk:whr/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
         }
         switch (formType){
             case FORM_TYPE_IMAGE :
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
                 keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:medium/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"url",keepeekNode.at("/_links/kpk:whr/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"derivedSrcService",derivedSrcService);
                 break;
 
             case FORM_TYPE_VIDEO:
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_VIDEO);
                 keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:whr/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"url",keepeekNode.at("/_links/kpk:preview/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"preview",keepeekNode.at("/_links/kpk:preview/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"480p",keepeekNode.at("/_links/kpk:480p/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"1080p",keepeekNode.at("/_links/kpk:1080p/href").textValue());

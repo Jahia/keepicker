@@ -8,7 +8,7 @@ import {useContentEditorContext} from '@jahia/content-editor';
 
 export const KeePickerDialog = ({className, onItemSelection}) => {
     const {t} = useTranslation();
-    const {lang,uilang} = useContentEditorContext();
+    const {lang, uilang} = useContentEditorContext();
     const [keepeekData, setKeepeekData] = useState();
     const keepickerEl = useRef(null);
 
@@ -16,14 +16,16 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
 
     const {data, loading, error} = useQuery(edpKeepeekContentUUIDQuery, {
         variables: {
-            edpContentPaths: keepeekData && [keepeekConfig.mountPoint + '/' + keepeekData.id]
+            edpContentPaths: keepeekData && keepeekData.assets.map(asset => keepeekConfig.mountPoint + '/' + asset.id)
         },
         skip: !keepeekData
     });
 
     useEffect(() => {
         const handleMediaSelection = event => {
-            const media = event.detail.element;
+            const derived = event.detail.link ? [{url: event.detail.link}] : [];
+            const media = {assets :  [{...event.detail.element, derived}]};
+
             setKeepeekData(media);
         };
 
@@ -35,8 +37,11 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
 
     useEffect(() => {
         if (!error && !loading && data?.jcr?.result) {
-            //TODO check the new linkto for the url
-            const exts = [{url: keepeekData.previewUrl, name: keepeekData.title?.value}];
+            const exts = keepeekData.assets.map(({previewUrl: url, derived, title: name}) => ({
+                name: name?.value,
+                url: derived && derived.length > 0 ? derived[0].url : url
+            }));
+
             onItemSelection(data.jcr.result.map((m, i) => ({...m, ...exts[i]})));
         }
     }, [keepeekData, data, error, loading, onItemSelection]);
