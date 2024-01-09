@@ -6,9 +6,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jahia.osgi.BundleUtils;
 import org.jahia.se.modules.dam.keepeek.model.KeepeekAsset;
@@ -16,15 +20,16 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.decorator.JCRNodeDecorator;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
 import java.net.URI;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
@@ -132,23 +137,49 @@ public class KeepeekDecorator extends JCRNodeDecorator {
         }
     }
 
-    private String getResizedUrl(Map<String,String> params){
-        String poiX = this.getPropertyAsString("kpk:poiX");
-        String poiY = this.getPropertyAsString("kpk:poiY");
-        String kpkp = this.getPropertyAsString("kpk:derivedSrcService");
-        String w = params.get("w");
-        String h = params.get("w");
+    private String getResizedUrl(Map<String,String> params) throws RepositoryException {
+        Map<String, String> query = new LinkedHashMap<String, String>();
+        if(this.getPropertyAsString("kpk:poiX") != null)
+            query.put("poiX",this.getPropertyAsString("kpk:poiX"));
+        if(this.getPropertyAsString("kpk:poiY") != null)
+            query.put("poiY",this.getPropertyAsString("kpk:poiY"));
 
+        query.put("src",this.getPropertyAsString("kpk:derivedSrcService"));
+
+        if(params.get("w") != null)
+            query.put("w",params.get("w"));
+        if(params.get("h") != null)
+            query.put("h",params.get("h"));
+
+        String signature  = queryKeepeekSignature("/resize",query);
     }
 
-    private String queryKeepeekSignature(String path) throws RepositoryException {
+    //http://thumbnail.services.keepeek.com/uwvyoZc4h-83FrubxPZTPSzrs1ARIGPt_TyL5UKbatQ/resize?src=kpk://tst/1/0/100-476kd2t22l.jpg&w=250&h=250&ex=true&f=webp
+    private String queryKeepeekSignature(String path,Map<String, String> query) throws RepositoryException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        ConfigurationAdmin configAdmin = BundleUtils.getOsgiService(ConfigurationAdmin.class, null);
         try {
-            String schema = keepeekProviderConfig.getApiSchema();
-            String endpoint = keepeekProviderConfig.getApiEndPoint();
-            String apiAccount = keepeekProviderConfig.getApiAccount();
-            String apiSecret = keepeekProviderConfig.getApiSecret();
+            Configuration config = configAdmin.getConfiguration("org.jahia.se.modules.keepicker_credentials");
+            if (config == null) {
+                throw new Exception();
+            }
+            Dictionary<String, ?> dict = config.getProperties();
+            List<String> keys = Collections.list(dict.keys());
+            Map<String, Object> properties = keys.stream()
+                    .collect(Collectors.toMap(Function.identity(), dict::get));
 
-            URIBuilder builder = new URIBuilder().setScheme(schema).setHost(endpoint).setPath(path);
+            String schema = (String) properties.get("keepeek_provider.back.apiSchema");
+            String endpoint = (String) properties.get("keepeek_provider.back.apiEndPoint");
+            String apiAccount = (String) properties.get("keepeek_provider.back.apiAccount");
+            String apiSecret = (String) properties.get("keepeek_provider.back.apiSecret");
+            String privateKey = (String) properties.get("keepeek_provider.back.privateKey");
+            List<NameValuePair> parameters = new ArrayList<>(query.size());
+
+            for (Map.Entry<String, String> entry : query.entrySet()) {
+                parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+            }
+
+            URIBuilder builder = new URIBuilder().setScheme(schema).setHost(endpoint).setPath(privateKey+path).setParameters(parameters);
 
             URI uri = builder.build();
 
@@ -169,10 +200,10 @@ public class KeepeekDecorator extends JCRNodeDecorator {
                 if (resp != null) {
                     resp.close();
                 }
-                LOGGER.debug("Request {} executed in {} ms",uri, (System.currentTimeMillis() - l));
+                logger.debug("Request {} executed in {} ms",uri, (System.currentTimeMillis() - l));
             }
         } catch (Exception e) {
-            LOGGER.error("Error while querying Keepeek", e);
+            logger.error("Error while querying Keepeek", e);
             throw new RepositoryException(e);
         }
     }

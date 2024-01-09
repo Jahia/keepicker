@@ -10,6 +10,8 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import javax.jcr.RepositoryException;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
@@ -40,7 +42,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         String formType = keepeekNode.get("formType").textValue();
         String id = Integer.toString(keepeekNode.get("id").intValue());
         //TODO
-        String derivedSrcService = null;
+        String derivedSrcService = getDerivedSrcService(keepeekAsset);
 
         keepeekAsset.setId(id);
         keepeekAsset.addProperty(PREFIX+"assetId",id);
@@ -101,5 +103,17 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
                 break;
         }
         return keepeekAsset;
+    }
+
+    private String getDerivedSrcService(JsonNode keepeekNode){
+        String src = keepeekNode.at("/_links/kpk:whr/href").textValue();
+        String regex = "pm_(?<domain>\\d+)_(?<media>\\d+)_(?<id>[\\w-]+)-[a-zA-Z]+(?<ext>\\.[a-zA-Z]+)";
+        Pattern urlPattern = Pattern.compile(regex);
+        Matcher matcher = urlPattern.matcher(src);
+
+        if (matcher.find()) {
+            baseUrl = matcher.group("baseUrl");
+            endUrl = matcher.group("endUrl");
+        }
     }
 }
