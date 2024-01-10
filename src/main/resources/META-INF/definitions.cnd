@@ -33,7 +33,7 @@
  - kpk:url (string) fulltextsearchable=no
 
 [kpknt:image] > jnt:file, jmix:image, kpkmix:kpkAsset, kpkmix:kpkImageProps
- - kpk:urls (string) fulltextsearchable=no
+// - kpk:urls (string) fulltextsearchable=no
  - kpk:derivedSrcService (string) fulltextsearchable=no
 
 [kpknt:video] > jnt:file, kpkmix:kpkAsset, kpkmix:kpkImageProps

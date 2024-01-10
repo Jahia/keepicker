@@ -10,6 +10,8 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import javax.jcr.RepositoryException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +43,7 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
 
         String formType = keepeekNode.get("formType").textValue();
         String id = Integer.toString(keepeekNode.get("id").intValue());
-        //TODO
-        String derivedSrcService = getDerivedSrcService(keepeekAsset);
+        String derivedSrcService = getDerivedSrcService(keepeekNode);
 
         keepeekAsset.setId(id);
         keepeekAsset.addProperty(PREFIX+"assetId",id);
@@ -84,7 +85,9 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
                 keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:medium/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"url",keepeekNode.at("/_links/kpk:whr/href").textValue());
-                keepeekAsset.addProperty(PREFIX+"derivedSrcService",derivedSrcService);
+                if(derivedSrcService != null && !derivedSrcService.isEmpty()){
+                    keepeekAsset.addProperty(PREFIX+"derivedSrcService",derivedSrcService);
+                }
                 break;
 
             case FORM_TYPE_VIDEO:
@@ -105,15 +108,22 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         return keepeekAsset;
     }
 
-    private String getDerivedSrcService(JsonNode keepeekNode){
+    private String getDerivedSrcService(JsonNode keepeekNode) throws UnsupportedEncodingException {
         String src = keepeekNode.at("/_links/kpk:whr/href").textValue();
-        String regex = "pm_(?<domain>\\d+)_(?<media>\\d+)_(?<id>[\\w-]+)-[a-zA-Z]+(?<ext>\\.[a-zA-Z]+)";
+        String regex = "medias/domain(?<domain>\\d+)/media(?<media>\\d+)/(?<id>[\\w-]+)-[a-zA-Z]+(?<ext>\\.[a-zA-Z]+)";
         Pattern urlPattern = Pattern.compile(regex);
         Matcher matcher = urlPattern.matcher(src);
-
+        StringBuilder sb = new StringBuilder();
+        String protocole = "kpk";
+        String identifiant = "iconeek"; //keepeek_provider.front.keycloakRealm = iconeek
         if (matcher.find()) {
-            baseUrl = matcher.group("baseUrl");
-            endUrl = matcher.group("endUrl");
+            String  domain = matcher.group("domain");
+            String media = matcher.group("media");
+            String id = matcher.group("id");
+            String ext = matcher.group("ext");
+            sb.append(protocole).append("://").append(identifiant).append("/").append(domain).append("/").append(media).append("/").append(id).append(ext);
+            return URLEncoder.encode(sb.toString(), "UTF-8");
         }
+        return null;
     }
 }

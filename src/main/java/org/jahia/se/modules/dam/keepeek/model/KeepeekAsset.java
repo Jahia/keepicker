@@ -43,6 +43,11 @@ public class KeepeekAsset {
         properties.put(name, new String[]{value.toString()});
     }
 
+    public String[] getProperty(String name){
+        if(name == null) return null;
+        return properties.get(name);
+    }
+
     public void addBinaryProperty(String name, Binary value) {
         if (value == null) return;
         binaryProperties.put(name, new Binary[]{value});
