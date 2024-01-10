@@ -59,7 +59,7 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
         return <LoaderOverlay/>;
     }
 
-    if (!keepeekConfig.keycloakUrl || !keepeekConfig.keycloakRealm || !keepeekConfig.keycloakClientId || !keepeekConfig.apiEndPoint) {
+    if (/*!keepeekConfig.keycloakUrl || !keepeekConfig.keycloakRealm ||*/ !keepeekConfig.keycloakClientId || !keepeekConfig.apiEndPoint) {
         console.error('Keepeek front config error at least one front paramter is missing check the files org.jahia.se.modules.keepicker_credentials');
         return <p>config issue</p>;
     }

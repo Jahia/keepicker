@@ -9,8 +9,8 @@
 <c:choose>
     <c:when test="${! empty keepeekConfig}">
         window.contextJsParameters.config.keepeek={
-            keycloakUrl:"${keepeekConfig['keepeek_provider.front.keycloakUrl']}",
-            keycloakRealm:"${keepeekConfig['keepeek_provider.front.keycloakRealm']}",
+            <%--keycloakUrl:"${keepeekConfig['keepeek_provider.front.keycloakUrl']}",--%>
+            <%--keycloakRealm:"${keepeekConfig['keepeek_provider.front.keycloakRealm']}",--%>
             keycloakClientId:"${keepeekConfig['keepeek_provider.front.keycloakClientId']}",
             apiEndPoint:"${keepeekConfig['keepeek_provider.front.apiEndPoint']}",
             pickerCdn:"${keepeekConfig['keepeek_provider.front.pickerCdn']}",
