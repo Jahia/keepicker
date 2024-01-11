@@ -14,25 +14,29 @@
  - kpk:importDate (string) fulltextsearchable=no
  - kpk:fileSize (long)
  - kpk:fileSizeString (string) fulltextsearchable=no
- - kpk:width (long)
- - kpk:height (long)
+ - kpk:poiX (double)
+ - kpk:poiY (double)
+// - kpk:width (long)
+// - kpk:height (long)
  - kpk:resolution (long)
- - kpk:mediaType (string) fulltextsearchable=no
+// - kpk:mediaType (string) fulltextsearchable=no
  - kpk:formType (string) fulltextsearchable=no
  - kpk:thumbnailGenerationStatus (string) fulltextsearchable=no
 // - kpk:cover (string) fulltextsearchable=no
  - kpk:poster (string) fulltextsearchable=no
 
 [kpkmix:kpkImageProps] mixin
- - kpk:xlarge (string) fulltextsearchable=no
- - kpk:large (string) fulltextsearchable=no
- - kpk:medium (string) fulltextsearchable=no
- - kpk:small (string) fulltextsearchable=no
- - kpk:whr (string) fulltextsearchable=no
+// - kpk:xlarge (string) fulltextsearchable=no
+// - kpk:large (string) fulltextsearchable=no
+// - kpk:medium (string) fulltextsearchable=no
+// - kpk:small (string) fulltextsearchable=no
+ - kpk:url (string) fulltextsearchable=no
 
-[kpknt:image] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
+[kpknt:image] > jnt:file, jmix:image, kpkmix:kpkAsset, kpkmix:kpkImageProps
+// - kpk:urls (string) fulltextsearchable=no
+ - kpk:derivedSrcService (string) fulltextsearchable=no
 
-[kpknt:video] > jnt:content, kpkmix:kpkAsset, kpkmix:kpkImageProps
+[kpknt:video] > jnt:file, kpkmix:kpkAsset, kpkmix:kpkImageProps
  - kpk:preview (string) fulltextsearchable=no
  - kpk:480p (string) fulltextsearchable=no
  - kpk:1080p (string) fulltextsearchable=no
@@ -40,7 +44,7 @@
  - kpk:duration (string) fulltextsearchable=no
  - kpk:durationInSeconds (double)
 
-[kpknt:other] > jnt:content, kpkmix:kpkAsset
+[kpknt:other] > jnt:file, kpkmix:kpkAsset
 
-[kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
- - j:node (weakreference) < 'kpkmix:kpkAsset'
+//[kpknt:kpkReference] > jnt:content, jmix:nodeReference, jmix:multimediaContent
+// - j:node (weakreference,picker[type='file']) < 'kpkmix:kpkAsset'

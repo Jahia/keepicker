@@ -1,1 +1,1 @@
-export * from './KeePicker'
+export * from './KeePickerDialog';

@@ -5,10 +5,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.apache.jackrabbit.value.BinaryImpl;
+import org.joda.time.format.ISODateTimeFormat;
 
+import javax.jcr.RepositoryException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
 public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
     private static final String PREFIX = "kpk:";
@@ -17,30 +24,6 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
     private static final String FORM_TYPE_VIDEO = "VIDEO";
 //    private static final String FORM_TYPE_SOUND = "SOUND";
 //    private static final String FORMAT_DOCUMENT = "DOCUMENT";
-
-    private static final String CONTENT_TYPE_IMAGE = "kpknt:image";
-    private static final String CONTENT_TYPE_VIDEO = "kpknt:video";
-//    private static final String CONTENT_TYPE_PDF = "kpknt:pdf";
-//    private static final String CONTENT_TYPE_DOC = "kpknt:document";
-    private static final String CONTENT_TYPE_OTHER = "kpknt:other";
-//    private class Urls {
-//        private String baseUrl;
-//        private String endUrl;
-//
-//        public Urls(String url){
-//            String regex = "(?<baseUrl>.*upload)/(?<endUrl>.*)";
-//            Pattern urlPattern = Pattern.compile(regex);
-//            Matcher matcher = urlPattern.matcher(url);
-//
-//            if(matcher.find()){
-//                baseUrl=matcher.group("baseUrl");
-//                endUrl=matcher.group("endUrl");
-//            }
-//        }
-//        public String getBaseUrl(){return baseUrl;}
-//        public String getEndUrl(){return endUrl;}
-//    }
-
 
     public KeepeekAssetDeserializer() {
         this(null);
@@ -58,12 +41,9 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         JsonNode keepeekNode = jsonParser.getCodec().readTree(jsonParser);
         KeepeekAsset keepeekAsset = new KeepeekAsset();
 
-//        List<String> mixinTypes = new ArrayList<String>();
-//        "cloudymix:cloudyAsset"
-//        keepeekAsset.addProperty("jcr:mixinTypes","cloudymix:cloudyAsset");
-
         String formType = keepeekNode.get("formType").textValue();
         String id = Integer.toString(keepeekNode.get("id").intValue());
+        String derivedSrcService = getDerivedSrcService(keepeekNode);
 
         keepeekAsset.setId(id);
         keepeekAsset.addProperty(PREFIX+"assetId",id);
@@ -73,33 +53,47 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         keepeekAsset.addProperty(PREFIX+"statusUpdateDate",keepeekNode.get("statusUpdateDate").textValue());
         keepeekAsset.addProperty(PREFIX+"creationDate",keepeekNode.get("creationDate").textValue());
         keepeekAsset.addProperty(PREFIX+"updateDate",keepeekNode.get("updateDate").textValue());
+        keepeekAsset.addProperty("jcr:lastModified", ISODateTimeFormat.dateTime().parseDateTime(keepeekNode.get("updateDate").textValue()).toString());
         keepeekAsset.addProperty(PREFIX+"importDate",keepeekNode.get("importDate").textValue());
         keepeekAsset.addProperty(PREFIX+"fileSize",keepeekNode.get("fileSize").longValue());
         keepeekAsset.addProperty(PREFIX+"fileSizeString",keepeekNode.get("fileSizeString").textValue());
-        keepeekAsset.addProperty(PREFIX+"width",keepeekNode.get("width").longValue());
-        keepeekAsset.addProperty(PREFIX+"height",keepeekNode.get("height").longValue());
+        keepeekAsset.addProperty("j:width",keepeekNode.get("width").longValue());
+        keepeekAsset.addProperty("j:height",keepeekNode.get("height").longValue());
+        if(keepeekNode.has("pointOfInterest")) {
+            keepeekAsset.addProperty(PREFIX + "poiX", keepeekNode.at("/pointOfInterest/x").doubleValue());
+            keepeekAsset.addProperty(PREFIX + "poiY", keepeekNode.at("/pointOfInterest/y").doubleValue());
+        }
         keepeekAsset.addProperty(PREFIX+"resolution",keepeekNode.get("resolution").longValue());
-        keepeekAsset.addProperty(PREFIX+"mediaType",keepeekNode.get("mediaType").textValue());
+        keepeekAsset.addProperty("jcr:mimeType",keepeekNode.get("mediaType").textValue());
         keepeekAsset.addProperty(PREFIX+"formType",formType);
         keepeekAsset.addProperty(PREFIX+"thumbnailGenerationStatus",keepeekNode.get("thumbnailGenerationStatus").textValue());
-//        keepeekAsset.addProperty(PREFIX+"cover",keepeekNode.at("/_links/kpk:cover/href").textValue());
+        keepeekAsset.addBinaryProperty("jcr:data", new BinaryImpl(new byte[0]) {
+            @Override
+            public long getSize() throws RepositoryException {
+                return keepeekNode.get("fileSize").longValue();
+            }
+        });
 
         if(FORM_TYPE_IMAGE.equals(formType) || FORM_TYPE_VIDEO.equals(formType)){
-            keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
-            keepeekAsset.addProperty(PREFIX+"whr",keepeekNode.at("/_links/kpk:whr/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"xlarge",keepeekNode.at("/_links/kpk:xlarge/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"large",keepeekNode.at("/_links/kpk:large/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"medium",keepeekNode.at("/_links/kpk:medium/href").textValue());
+//            keepeekAsset.addProperty(PREFIX+"small",keepeekNode.at("/_links/kpk:small/href").textValue());
         }
         switch (formType){
             case FORM_TYPE_IMAGE :
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_IMAGE);
                 keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:medium/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"url",keepeekNode.at("/_links/kpk:whr/href").textValue());
+                if(derivedSrcService != null && !derivedSrcService.isEmpty()){
+                    keepeekAsset.addProperty(PREFIX+"derivedSrcService",derivedSrcService);
+                }
                 break;
 
             case FORM_TYPE_VIDEO:
                 keepeekAsset.setJahiaNodeType(CONTENT_TYPE_VIDEO);
                 keepeekAsset.addProperty(PREFIX+"poster",keepeekNode.at("/_links/kpk:whr/href").textValue());
+                keepeekAsset.addProperty(PREFIX+"url",keepeekNode.at("/_links/kpk:preview/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"preview",keepeekNode.at("/_links/kpk:preview/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"480p",keepeekNode.at("/_links/kpk:480p/href").textValue());
                 keepeekAsset.addProperty(PREFIX+"1080p",keepeekNode.at("/_links/kpk:1080p/href").textValue());
@@ -114,19 +108,22 @@ public class KeepeekAssetDeserializer extends StdDeserializer<KeepeekAsset> {
         return keepeekAsset;
     }
 
-//    private void addPoster(String url, KeepeekAsset keepeekAsset){
-//        url = url.substring(0, url.lastIndexOf('.')).concat(".jpg") ;
-//        keepeekAsset.addProperty(PREFIX+"poster",url);
-//    }
-
-//    private void splitURL(String url, KeepeekAsset keepeekAsset){
-//        String regex = "(?<baseUrl>.*upload)/(?<endUrl>.*)";
-//        Pattern urlPattern = Pattern.compile(regex);
-//        Matcher matcher = urlPattern.matcher(url);
-//
-//        if(matcher.find()){
-//            keepeekAsset.addProperty(PREFIX+"baseUrl",matcher.group("baseUrl"));
-//            keepeekAsset.addProperty(PREFIX+"endUrl",matcher.group("endUrl"));
-//        }
-//    }
+    private String getDerivedSrcService(JsonNode keepeekNode) throws UnsupportedEncodingException {
+        String src = keepeekNode.at("/_links/kpk:whr/href").textValue();
+        String regex = "medias/domain(?<domain>\\d+)/media(?<media>\\d+)/(?<id>[\\w-]+)-[a-zA-Z]+(?<ext>\\.[a-zA-Z]+)";
+        Pattern urlPattern = Pattern.compile(regex);
+        Matcher matcher = urlPattern.matcher(src);
+        StringBuilder sb = new StringBuilder();
+        String protocole = "kpk";
+        String identifiant = "iconeek"; //keepeek_provider.front.keycloakRealm = iconeek
+        if (matcher.find()) {
+            String  domain = matcher.group("domain");
+            String media = matcher.group("media");
+            String id = matcher.group("id");
+            String ext = matcher.group("ext");
+            sb.append(protocole).append("://").append(identifiant).append("/").append(domain).append("/").append(media).append("/").append(id).append(ext);
+            return URLEncoder.encode(sb.toString(), "UTF-8");
+        }
+        return null;
+    }
 }

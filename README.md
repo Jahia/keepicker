@@ -106,6 +106,6 @@ a provider if you use [DAM Selector][DamSelector].
 
 [mount.cfg]:./src/main/resources/META-INF/configurations/org.jahia.se.modules.keepicker_credentials.cfg
 [definition.cnd]: ./src/main/resources/META-INF/definitions.cnd
-[react:index.js]: ./src/javascript/KeePicker/KeePicker.jsx
+[react:index.js]: ./src/javascript/KeePicker/KeePickerDialog.jsx
 [KeepeekDataSource.java]: ./src/main/java/org/jahia/se/modules/dam/keepeek/edp/KeepeekDataSource.java
 [DamSelector]: https://store.jahia.com/contents/modules-repository/org/jahia/se/modules/dam-selector.html

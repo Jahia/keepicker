@@ -2,6 +2,7 @@ package org.jahia.se.modules.dam.keepeek.edp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -28,9 +29,7 @@ import java.util.*;
 public class KeepeekDataSource implements ExternalDataSource{
     private static final Logger LOGGER = LoggerFactory.getLogger(KeepeekDataSource.class);
 
-//    private static final String ASSET_ENTRY = "assets";
-//    private static final String ASSET_ENTRY_EXPAND = "embeds,thumbnails,file_properties";
-
+    private final String API_PATH = "/dam/medias";
     private final ObjectMapper mapper = new ObjectMapper();
     private final KeepeekProviderConfig keepeekProviderConfig;
     private final KeepeekCacheManager keepeekCacheManager;
@@ -53,23 +52,27 @@ public class KeepeekDataSource implements ExternalDataSource{
     public ExternalData getItemByIdentifier(String identifier) throws ItemNotFoundException {
         try {
             if (identifier.equals("root")) {
-                return new ExternalData(identifier, "/", "jnt:contentFolder", new HashMap<String, String[]>());
+                return new ExternalData(identifier, "/", "jnt:folder", new HashMap<String, String[]>());
             }else{
+                String keepeekId = identifier;
+                boolean isContent = false;
+                if (identifier.endsWith("/jcr:content")) {
+                    keepeekId = StringUtils.substringBefore(identifier, "/jcr:content");
+                    isContent = true;
+                }
+
                 synchronized (this){
-                    KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(identifier);
+                    KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(keepeekId);
                     if(keepeekAsset == null){
                         LOGGER.debug("no cacheEntry for : "+identifier);
-                        final String path = "/dam/medias/"+identifier;
-//                        Map<String, String> query = new LinkedHashMap<String, String>();
-//                        query.put("expand",ASSET_ENTRY_EXPAND);
+                        final String path = API_PATH + "/" +identifier;
                         keepeekAsset = queryKeepeek(path);
                         keepeekCacheManager.cacheKeepeekAsset(keepeekAsset);
                     }
-                    ExternalData data = new ExternalData(identifier, "/"+identifier, keepeekAsset.getJahiaNodeType(), keepeekAsset.getProperties());
-//                    List<String> mixins = new ArrayList<String>();
-//                    mixins.add("cloudymix:cloudyAsset");
-//                    data.setMixin(mixins);
-
+                    ExternalData data = new ExternalData(identifier, "/"+identifier, isContent ? "jnt:resource" : keepeekAsset.getJahiaNodeType(), keepeekAsset.getProperties());
+                    if (isContent) {
+                        data.setBinaryProperties(keepeekAsset.getBinaryProperties());
+                    }
                     return data;
                 }
             }
@@ -89,10 +92,10 @@ public class KeepeekDataSource implements ExternalDataSource{
 
             if (splitPath.length <= 1) {
                 return getItemByIdentifier("root");
-
             } else if (splitPath.length == 2) {
                 return getItemByIdentifier(splitPath[1]);
-
+            } else if (splitPath.length == 3 && splitPath[2].equals("jcr:content")) {
+                return getItemByIdentifier(splitPath[1] + "/jcr:content");
             }
         } catch (ItemNotFoundException e) {
             throw new PathNotFoundException(e);
@@ -103,27 +106,28 @@ public class KeepeekDataSource implements ExternalDataSource{
     @Override
     public Set<String> getSupportedNodeTypes() {
         return Sets.newHashSet(
-                "jnt:contentFolder",
+                "jnt:folder",
                 "kpknt:image",
-//                "kpknt:video",
+                "kpknt:video",
 //                "kpknt:document",
                 "kpknt:other"
         );
     }
 
     @Override
-    public boolean isSupportsHierarchicalIdentifiers() {
-        return false;
-    }
+    public boolean isSupportsHierarchicalIdentifiers() { return false; }
 
     @Override
-    public boolean isSupportsUuid() {
-        return false;
-    }
+    public boolean isSupportsUuid() { return false; }
 
     @Override
     public boolean itemExists(String s) {
-        return false;
+        try {
+            getItemByPath(s);
+            return true;
+        } catch (PathNotFoundException e) {
+            return false;
+        }
     }
 
     private KeepeekAsset queryKeepeek(String path) throws RepositoryException {
@@ -140,23 +144,16 @@ public class KeepeekDataSource implements ExternalDataSource{
 //                parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 //            }
 
-            URIBuilder builder = new URIBuilder()
-                    .setScheme(schema)
-                    .setHost(endpoint)
-                    .setPath(path);
+            URIBuilder builder = new URIBuilder().setScheme(schema).setHost(endpoint).setPath(path);
 
             URI uri = builder.build();
 
             long l = System.currentTimeMillis();
             HttpGet getMethod = new HttpGet(uri);
 
-            //NOTE Keepeek return content in ISO-8859-1 even if Accept-Charset = UTF-8 is set.
-            //Need to use appropriate charset later to read the inputstream response.
             String encoding = Base64.getEncoder().encodeToString((apiAccount+":"+apiSecret).getBytes("UTF-8"));
             getMethod.setHeader(HttpHeaders.AUTHORIZATION,"Basic " + encoding);
             getMethod.setHeader("Content-Type","application/json");
-//            getMethod.setRequestHeader("Accept-Charset","ISO-8859-1");
-//            getMethod.setRequestHeader("Accept-Charset","UTF-8");
             CloseableHttpResponse resp = null;
             try {
                 resp = httpClient.execute(getMethod);
