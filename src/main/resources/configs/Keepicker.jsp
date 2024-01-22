@@ -15,6 +15,7 @@
             apiEndPoint:"${keepeekConfig['keepeek_provider.front.apiEndPoint']}",
             pickerCdn:"${keepeekConfig['keepeek_provider.front.pickerCdn']}",
             applyOnPickers:"${keepeekConfig['keepeek_provider.front.applyOnPickers']}",
+            keyUrlPath:"${keepeekConfig['keepeek_provider.front.keyUrlPath']}",
             mountPoint:"/sites/systemsite/contents/dam-keepeek"
         }
         console.debug("%c Keepeek config is added to contextJsParameters.config", 'color: #3c8cba');

@@ -7,6 +7,7 @@ i18next.loadNamespaces('keepicker');
 
 export default function () {
     const config = window.contextJsParameters.config?.keepeek;
+
     if (config && config.pickerCdn) {
         // Load keepeek js
         const script = document.createElement('script');
@@ -22,7 +23,7 @@ export default function () {
                     requireModuleInstalledOnSite: 'keepicker',
                     pickerConfigs: config.applyOnPickers ? config.applyOnPickers.split(',').map(item => item.trim()) : ['image', 'file'],
                     selectableTypes: ['kpkmix:kpkAsset'],
-                    keyUrlPath: 'keepeek',
+                    keyUrlPath: config.keyUrlPath || 'keepeek',
                     pickerInput: {
                         emptyLabel: 'keepicker:label.referenceCard.emptyLabel',
                         emptyIcon: svgKeepeekLogo
