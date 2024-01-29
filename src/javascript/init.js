@@ -35,6 +35,7 @@ export default function () {
                         icon: svgKeepeekLogo
                     }
                 });
+                console.debug('%c KeePicker Editor Extensions  is activated', 'color: #3c8cba');
             }
         });
     } else {
