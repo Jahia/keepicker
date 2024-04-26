@@ -3,8 +3,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
+        <artifactId>jahia-modules</artifactId>
         <version>8.2.0.0</version>
     </parent>
     <groupId>org.jahia.se.modules</groupId>
@@ -25,6 +25,7 @@
         <yarn.arguments>build:production</yarn.arguments>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
         <jahia-depends>default,external-provider</jahia-depends>
+        <jahia.plugin.version>6.9</jahia.plugin.version>
     </properties>
 
     <repositories>
