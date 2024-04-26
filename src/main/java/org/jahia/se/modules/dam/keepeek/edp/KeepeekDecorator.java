@@ -68,9 +68,9 @@ public class KeepeekDecorator extends JCRNodeDecorator {
             return super.getUrl();
         }
     }
-    //TODO review this with the signature call -> cache ?
-    public String getUrl(List<String> params) {
 
+    @Override
+    public String getUrl(List<String> params) {
         KeepeekCacheManager keepeekCacheManager = BundleUtils.getOsgiService(KeepeekCacheManager.class, null);
         try {
             if(this.isNodeType(CONTENT_TYPE_IMAGE)){
@@ -107,16 +107,13 @@ public class KeepeekDecorator extends JCRNodeDecorator {
                     KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(this.getPropertyAsString("kpk:assetId"));
 
                     String[] urls = keepeekAsset.getProperty("kpk:cachedDerivedUrls");
-    //                String urls = this.getPropertyAsString("kpk:urls");
                     String derivedUrl = null;
                     JSONObject jsonUrls;
 
                     if(urls == null || urls.length == 0){
-    //                if(urls == null || urls.trim().isEmpty()){
                         derivedUrl = getResizedUrl(keepeekProps);
                         jsonUrls = new JSONObject();
                     }else{
-    //                    jsonUrls = new JSONObject(urls);
                         jsonUrls = new JSONObject(urls[0]);
                         derivedUrl = (String) jsonUrls.opt(resizeKey);
                         if(derivedUrl == null || derivedUrl.trim().isEmpty()){
@@ -125,8 +122,6 @@ public class KeepeekDecorator extends JCRNodeDecorator {
                     }
                     jsonUrls.put(resizeKey,derivedUrl);
                     //store the url into the content in cache
-
-    //                keepeekAsset.addProperty("kpk:urls",jsonUrls.toString());
                     keepeekAsset.addProperty("kpk:cachedDerivedUrls",jsonUrls.toString());
                     keepeekCacheManager.cacheKeepeekAsset(keepeekAsset);
 
@@ -134,7 +129,6 @@ public class KeepeekDecorator extends JCRNodeDecorator {
                 } catch (JSONException e) {
                     //else build the url
                     return this.getUrl();
-    //                throw new RuntimeException(e);
                 } catch (UnsupportedEncodingException e) {
                     return this.getUrl();
                 }
