@@ -69,90 +69,94 @@ public class KeepeekDecorator extends JCRNodeDecorator {
         }
     }
     //TODO review this with the signature call -> cache ?
-    public String getUrl(List<String> params) throws RepositoryException {
+    public String getUrl(List<String> params) {
+
         KeepeekCacheManager keepeekCacheManager = BundleUtils.getOsgiService(KeepeekCacheManager.class, null);
-
-        if(this.isNodeType(CONTENT_TYPE_IMAGE)){
-            HashMap<String, String> keepeekProps = new HashMap<String, String>();
-            for (String param : params) {
-                if (param.startsWith("width:")) {
-                    String width = StringUtils.substringAfter(param, "width:");
-                    if(!width.trim().isEmpty()){
-                        keepeekProps.put("w", width);
+        try {
+            if(this.isNodeType(CONTENT_TYPE_IMAGE)){
+                HashMap<String, String> keepeekProps = new HashMap<String, String>();
+                for (String param : params) {
+                    if (param.startsWith("width:")) {
+                        String width = StringUtils.substringAfter(param, "width:");
+                        if(!width.trim().isEmpty()){
+                            keepeekProps.put("w", width);
+                        }
+                    }
+                    if (param.startsWith("height:")) {
+                        String height = StringUtils.substringAfter(param, "height:");
+                        if(!height.trim().isEmpty()){
+                            keepeekProps.put("h", height);
+                        }
                     }
                 }
-                if (param.startsWith("height:")) {
-                    String height = StringUtils.substringAfter(param, "height:");
-                    if(!height.trim().isEmpty()){
-                        keepeekProps.put("h", height);
-                    }
+
+                //Note : is poiX & poiY should be part of the key ? if yes uncomment ;
+    //            if(this.getPropertyAsString("kpk:poiX") != null)
+    //                keepeekProps.put("poiX", this.getPropertyAsString("kpk:poiX"));
+    //            if(this.getPropertyAsString("kpk:poiY") != null)
+    //                keepeekProps.put("poiY", this.getPropertyAsString("kpk:poiY"));
+
+                //build the key
+                StringBuilder sb = new StringBuilder();
+                for(String key : keepeekProps.keySet()){
+                    sb.append(key + keepeekProps.get(key));
                 }
-            }
 
-            //Note : is poiX & poiY should be part of the key ? if yes uncomment ;
-//            if(this.getPropertyAsString("kpk:poiX") != null)
-//                keepeekProps.put("poiX", this.getPropertyAsString("kpk:poiX"));
-//            if(this.getPropertyAsString("kpk:poiY") != null)
-//                keepeekProps.put("poiY", this.getPropertyAsString("kpk:poiY"));
+                String resizeKey = sb.toString();
+                try{
+                    KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(this.getPropertyAsString("kpk:assetId"));
 
-            //build the key
-            StringBuilder sb = new StringBuilder();
-            for(String key : keepeekProps.keySet()){
-                sb.append(key + keepeekProps.get(key));
-            }
+                    String[] urls = keepeekAsset.getProperty("kpk:cachedDerivedUrls");
+    //                String urls = this.getPropertyAsString("kpk:urls");
+                    String derivedUrl = null;
+                    JSONObject jsonUrls;
 
-            String resizeKey = sb.toString();
-            try{
-                KeepeekAsset keepeekAsset = keepeekCacheManager.getKeepeekAsset(this.getPropertyAsString("kpk:assetId"));
-
-                String[] urls = keepeekAsset.getProperty("kpk:cachedDerivedUrls");
-//                String urls = this.getPropertyAsString("kpk:urls");
-                String derivedUrl = null;
-                JSONObject jsonUrls;
-
-                if(urls == null || urls.length == 0){
-//                if(urls == null || urls.trim().isEmpty()){
-                    derivedUrl = getResizedUrl(keepeekProps);
-                    jsonUrls = new JSONObject();
-                }else{
-//                    jsonUrls = new JSONObject(urls);
-                    jsonUrls = new JSONObject(urls[0]);
-                    derivedUrl = (String) jsonUrls.opt(resizeKey);
-                    if(derivedUrl == null || derivedUrl.trim().isEmpty()){
+                    if(urls == null || urls.length == 0){
+    //                if(urls == null || urls.trim().isEmpty()){
                         derivedUrl = getResizedUrl(keepeekProps);
+                        jsonUrls = new JSONObject();
+                    }else{
+    //                    jsonUrls = new JSONObject(urls);
+                        jsonUrls = new JSONObject(urls[0]);
+                        derivedUrl = (String) jsonUrls.opt(resizeKey);
+                        if(derivedUrl == null || derivedUrl.trim().isEmpty()){
+                            derivedUrl = getResizedUrl(keepeekProps);
+                        }
+                    }
+                    jsonUrls.put(resizeKey,derivedUrl);
+                    //store the url into the content in cache
+
+    //                keepeekAsset.addProperty("kpk:urls",jsonUrls.toString());
+                    keepeekAsset.addProperty("kpk:cachedDerivedUrls",jsonUrls.toString());
+                    keepeekCacheManager.cacheKeepeekAsset(keepeekAsset);
+
+                    return derivedUrl;
+                } catch (JSONException e) {
+                    //else build the url
+                    return this.getUrl();
+    //                throw new RuntimeException(e);
+                } catch (UnsupportedEncodingException e) {
+                    return this.getUrl();
+                }
+            }else if(this.isNodeType(CONTENT_TYPE_VIDEO)){
+                String keepeekProps = VIDEO_TYPE_PREVIEW;
+                for (String param : params) {
+                    if (param.startsWith("quality:")) {
+                        String quality = StringUtils.substringAfter(param, "quality:");
+                        if( VIDEO_TYPE_PREVIEW.equals(quality) ||
+                                VIDEO_TYPE_480.equals(quality) ||
+                                VIDEO_TYPE_1080.equals(quality)
+                        ){
+                            keepeekProps = quality;
+                        }
+                        return node.getProperty(keepeekProps).getString();
                     }
                 }
-                jsonUrls.put(resizeKey,derivedUrl);
-                //store the url into the content in cache
-
-//                keepeekAsset.addProperty("kpk:urls",jsonUrls.toString());
-                keepeekAsset.addProperty("kpk:cachedDerivedUrls",jsonUrls.toString());
-                keepeekCacheManager.cacheKeepeekAsset(keepeekAsset);
-
-                return derivedUrl;
-            } catch (JSONException e) {
-                //else build the url
-                return this.getUrl();
-//                throw new RuntimeException(e);
-            } catch (UnsupportedEncodingException e) {
-                return this.getUrl();
-            }
-        }else if(this.isNodeType(CONTENT_TYPE_VIDEO)){
-            String keepeekProps = VIDEO_TYPE_PREVIEW;
-            for (String param : params) {
-                if (param.startsWith("quality:")) {
-                    String quality = StringUtils.substringAfter(param, "quality:");
-                    if( VIDEO_TYPE_PREVIEW.equals(quality) ||
-                            VIDEO_TYPE_480.equals(quality) ||
-                            VIDEO_TYPE_1080.equals(quality)
-                    ){
-                        keepeekProps = quality;
-                    }
-                    return node.getProperty(keepeekProps).getString();
-                }
-            }
-            return node.getProperty(keepeekProps).getString();
-        }else{
+                return node.getProperty(keepeekProps).getString();
+            }else{
+            return this.getUrl();
+        }
+        }catch (RepositoryException e) {
             return this.getUrl();
         }
     }

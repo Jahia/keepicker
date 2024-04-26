@@ -90,7 +90,8 @@ module.exports = (env, argv) => {
             new ModuleFederationPlugin(getModuleFederationConfig(packageJson, {
                 remotes: {
                     '@jahia/app-shell': 'appShellRemote',
-                    '@jahia/content-editor':'appShell.remotes.contentEditor'
+                    // '@jahia/content-editor':'appShell.remotes.contentEditor'
+                    '@jahia/jcontent':'appShell.remotes.jcontent'
                 }
             })),
             new CleanWebpackPlugin({
