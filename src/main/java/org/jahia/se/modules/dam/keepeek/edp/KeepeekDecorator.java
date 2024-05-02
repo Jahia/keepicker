@@ -1,26 +1,18 @@
 package org.jahia.se.modules.dam.keepeek.edp;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jahia.osgi.BundleUtils;
 import org.jahia.se.modules.dam.keepeek.model.KeepeekAsset;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.decorator.JCRNodeDecorator;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.cm.Configuration;
@@ -32,12 +24,10 @@ import javax.jcr.RepositoryException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.camel.model.rest.RestParamType.query;
 import static org.jahia.se.modules.dam.keepeek.ContentTypesConstants.*;
 
 public class KeepeekDecorator extends JCRNodeDecorator {
