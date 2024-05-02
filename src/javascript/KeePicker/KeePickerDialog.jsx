@@ -4,11 +4,11 @@ import {LoaderOverlay} from '../DesignSystem/LoaderOverlay';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@apollo/react-hooks';
 import {edpKeepeekContentUUIDQuery} from './edpKeepeekContentUUID.gql-queries';
-import {useContentEditorContext} from '@jahia/content-editor';
+import {useContentEditorContext} from '@jahia/jcontent';
 
 export const KeePickerDialog = ({className, onItemSelection}) => {
     const {t} = useTranslation();
-    const {lang, uilang} = useContentEditorContext();
+    const {lang} = useContentEditorContext();
     const [keepeekData, setKeepeekData] = useState();
     const keepickerEl = useRef(null);
 
@@ -73,7 +73,7 @@ export const KeePickerDialog = ({className, onItemSelection}) => {
                 keycloak-client-id={keepeekConfig.keycloakClientId}
                 api-endpoint={keepeekConfig.apiEndPoint}
                 data-locale={lang}
-                ui-locale={uilang}
+                ui-locale={lang}
             />
         </div>
     );
